@@ -3,315 +3,375 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Community Business Directory</title>
-
-  <!-- Supabase -->
+  <title>Community Business Hub</title>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <!-- React 18 -->
   <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
   <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
-  <!-- Babel -->
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-  <!-- Bootstrap 5 -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
-  <!-- Bootstrap Icons -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet" />
-
   <style>
     :root {
-      --brand: #1a56db;
-      --brand-dark: #1340a8;
-      --brand-light: #eff6ff;
-      --accent: #f59e0b;
-      --success: #10b981;
-      --danger: #ef4444;
-      --text: #1e293b;
-      --muted: #64748b;
-      --border: #e2e8f0;
-      --bg: #f1f5f9;
+      --brand:#1a56db; --brand-dark:#1340a8; --brand-light:#eff6ff;
+      --success:#10b981; --danger:#ef4444; --warn:#f59e0b;
+      --text:#1e293b; --muted:#64748b; --border:#e2e8f0; --bg:#f1f5f9;
     }
-
-    * { box-sizing: border-box; }
-
-    body {
-      background: var(--bg);
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      color: var(--text);
-      margin: 0;
-    }
-
-    /* ---- HEADER ---- */
-    .app-header {
-      background: linear-gradient(135deg, #1a56db 0%, #1340a8 50%, #0f2d7a 100%);
-      color: white;
-      padding: 1rem 0 0;
-      box-shadow: 0 4px 16px rgba(26,86,219,0.25);
-    }
-    .header-brand h1 { font-size: 1.5rem; font-weight: 700; margin: 0; letter-spacing: -0.3px; }
-    .header-brand p  { font-size: 0.82rem; opacity: 0.8; margin: 0; }
-    .header-badge { background: rgba(255,255,255,0.15); border-radius: 8px; padding: 0.4rem 1rem; font-size: 0.85rem; backdrop-filter: blur(4px); border: 1px solid rgba(255,255,255,0.2); }
-
-    /* ---- TABS ---- */
-    .app-tabs { background: transparent; padding: 0 0; margin-top: 0.75rem; }
-    .app-tabs .nav-link {
-      color: rgba(255,255,255,0.7);
-      font-weight: 500;
-      font-size: 0.9rem;
-      border: none;
-      border-radius: 0;
-      padding: 0.6rem 1rem;
-      transition: all 0.2s;
-      border-bottom: 3px solid transparent;
-    }
-    .app-tabs .nav-link:hover { color: white; }
-    .app-tabs .nav-link.active { color: white; border-bottom: 3px solid #60a5fa; font-weight: 600; }
-
-    /* ---- CARDS ---- */
-    .card-clean {
-      background: white;
-      border-radius: 14px;
-      border: 1px solid var(--border);
-      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-    }
-    .biz-card {
-      background: white;
-      border-radius: 12px;
-      border: 1px solid var(--border);
-      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
-      transition: transform 0.18s ease, box-shadow 0.18s ease;
-      height: 100%;
-    }
-    .biz-card:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 8px 28px rgba(26,86,219,0.12);
-      border-color: #93c5fd;
-    }
-    .biz-card-header {
-      background: linear-gradient(135deg, #eff6ff, #dbeafe);
-      border-radius: 12px 12px 0 0;
-      padding: 1rem 1rem 0.75rem;
-      border-bottom: 1px solid #dbeafe;
-    }
-    .biz-name { font-size: 1rem; font-weight: 700; color: var(--text); margin: 0 0 0.25rem; }
-    .type-badge {
-      display: inline-block;
-      background: var(--brand);
-      color: white;
-      padding: 0.2rem 0.65rem;
-      border-radius: 20px;
-      font-size: 0.72rem;
-      font-weight: 600;
-      letter-spacing: 0.02em;
-    }
-    .biz-info { font-size: 0.83rem; color: var(--muted); margin-bottom: 0.3rem; }
-    .biz-info i { width: 16px; color: var(--brand); }
-
-    /* ---- SEARCH BAR ---- */
-    .search-section {
-      background: white;
-      border-radius: 14px;
-      border: 1px solid var(--border);
-      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-      padding: 1.25rem;
-      margin-bottom: 1.25rem;
-    }
-    .search-label { font-size: 0.75rem; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.4rem; }
-
-    /* ---- FORM ---- */
-    .form-wrap { max-width: 680px; margin: 0 auto; }
-    .form-section-title { font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.07em; color: var(--muted); margin: 1.25rem 0 0.75rem; padding-bottom: 0.4rem; border-bottom: 1px solid var(--border); }
-    .form-label { font-size: 0.82rem; font-weight: 600; color: var(--text); margin-bottom: 0.3rem; }
-    .form-control, .form-select {
-      font-size: 0.9rem;
-      border-color: var(--border);
-      border-radius: 8px;
-      padding: 0.55rem 0.85rem;
-    }
-    .form-control:focus, .form-select:focus {
-      border-color: var(--brand);
-      box-shadow: 0 0 0 3px rgba(26,86,219,0.12);
-    }
-
-    /* ---- ADMIN TABLE ---- */
-    .admin-table th {
-      font-size: 0.75rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.06em;
-      color: var(--muted);
-      background: #f8fafc;
-      padding: 0.75rem 1rem;
-    }
-    .admin-table td { padding: 0.75rem 1rem; vertical-align: middle; font-size: 0.88rem; }
-    .admin-table tbody tr:hover { background: #f8fafc; }
-
-    /* ---- TOAST ---- */
-    #toast-container {
-      position: fixed; top: 1rem; right: 1rem;
-      z-index: 9999; display: flex; flex-direction: column; gap: 0.5rem;
-    }
-    .toast-item {
-      padding: 0.75rem 1.25rem;
-      border-radius: 10px;
-      font-size: 0.88rem;
-      font-weight: 600;
-      color: white;
-      box-shadow: 0 4px 16px rgba(0,0,0,0.15);
-      animation: slideIn 0.3s ease;
-      min-width: 260px;
-    }
-    .toast-success { background: var(--success); }
-    .toast-error   { background: var(--danger); }
-    .toast-info    { background: var(--brand); }
-    @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
-
-    /* ---- MISC ---- */
-    .empty-state { text-align: center; padding: 4rem 1rem; color: var(--muted); }
-    .empty-state i { font-size: 3.5rem; opacity: 0.4; }
-    .stat-chip { background: var(--brand-light); color: var(--brand); border-radius: 8px; padding: 0.3rem 0.8rem; font-size: 0.82rem; font-weight: 700; }
-    .pin-hint { font-size: 0.78rem; color: var(--muted); margin-top: 0.25rem; }
-    .btn { border-radius: 8px; font-weight: 600; font-size: 0.88rem; }
-    .btn-brand { background: var(--brand); color: white; border: none; }
-    .btn-brand:hover { background: var(--brand-dark); color: white; }
-    @media (max-width: 576px) {
-      .header-brand h1 { font-size: 1.2rem; }
-      .app-tabs .nav-link { font-size: 0.78rem; padding: 0.5rem 0.6rem; }
-    }
+    *{box-sizing:border-box;}
+    body{background:var(--bg);font-family:'Segoe UI',sans-serif;color:var(--text);margin:0;}
+    .app-header{background:linear-gradient(135deg,#1a56db 0%,#1340a8 50%,#0f2d7a 100%);color:white;padding:1rem 0 0;box-shadow:0 4px 16px rgba(26,86,219,.25);}
+    .header-brand h1{font-size:1.4rem;font-weight:700;margin:0;}
+    .header-brand p{font-size:.8rem;opacity:.8;margin:0;}
+    .header-badge{background:rgba(255,255,255,.15);border-radius:8px;padding:.35rem .9rem;font-size:.82rem;border:1px solid rgba(255,255,255,.2);}
+    .app-tabs .nav-link{color:rgba(255,255,255,.7);font-weight:500;font-size:.82rem;border:none;border-radius:0;padding:.55rem .85rem;border-bottom:3px solid transparent;white-space:nowrap;}
+    .app-tabs .nav-link:hover{color:white;}
+    .app-tabs .nav-link.active{color:white;border-bottom:3px solid #60a5fa;font-weight:600;}
+    .card-clean{background:white;border-radius:14px;border:1px solid var(--border);box-shadow:0 2px 8px rgba(0,0,0,.05);}
+    .biz-card{background:white;border-radius:12px;border:1px solid var(--border);box-shadow:0 2px 8px rgba(0,0,0,.04);transition:transform .18s,box-shadow .18s;height:100%;}
+    .biz-card:hover{transform:translateY(-3px);box-shadow:0 8px 28px rgba(26,86,219,.12);border-color:#93c5fd;}
+    .biz-card-header{background:linear-gradient(135deg,#eff6ff,#dbeafe);border-radius:12px 12px 0 0;padding:.9rem 1rem .7rem;border-bottom:1px solid #dbeafe;}
+    .job-card-header{background:linear-gradient(135deg,#f0fdf4,#dcfce7);border-radius:12px 12px 0 0;padding:.9rem 1rem .7rem;border-bottom:1px solid #bbf7d0;}
+    .biz-name{font-size:.95rem;font-weight:700;color:var(--text);margin:0 0 .2rem;}
+    .type-badge{display:inline-block;background:var(--brand);color:white;padding:.18rem .6rem;border-radius:20px;font-size:.7rem;font-weight:600;}
+    .job-badge{display:inline-block;background:#059669;color:white;padding:.18rem .6rem;border-radius:20px;font-size:.7rem;font-weight:600;}
+    .biz-info{font-size:.82rem;color:var(--muted);margin-bottom:.28rem;}
+    .biz-info i{width:16px;color:var(--brand);}
+    .search-section{background:white;border-radius:14px;border:1px solid var(--border);box-shadow:0 2px 8px rgba(0,0,0,.05);padding:1.2rem;margin-bottom:1.2rem;}
+    .search-label{font-size:.72rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:.35rem;}
+    .form-wrap{max-width:700px;margin:0 auto;}
+    .form-section-title{font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);margin:1.2rem 0 .7rem;padding-bottom:.35rem;border-bottom:1px solid var(--border);}
+    .form-label{font-size:.82rem;font-weight:600;color:var(--text);margin-bottom:.28rem;}
+    .form-control,.form-select{font-size:.88rem;border-color:var(--border);border-radius:8px;padding:.52rem .82rem;}
+    .form-control:focus,.form-select:focus{border-color:var(--brand);box-shadow:0 0 0 3px rgba(26,86,219,.12);}
+    .admin-table th{font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);background:#f8fafc;padding:.7rem 1rem;}
+    .admin-table td{padding:.7rem 1rem;vertical-align:middle;font-size:.86rem;}
+    .admin-table tbody tr:hover{background:#f8fafc;}
+    #toast-container{position:fixed;top:1rem;right:1rem;z-index:9999;display:flex;flex-direction:column;gap:.5rem;}
+    .toast-item{padding:.7rem 1.2rem;border-radius:10px;font-size:.86rem;font-weight:600;color:white;box-shadow:0 4px 16px rgba(0,0,0,.15);animation:slideIn .3s ease;min-width:250px;}
+    .toast-success{background:var(--success);} .toast-error{background:var(--danger);} .toast-info{background:var(--brand);}
+    @keyframes slideIn{from{transform:translateX(100%);opacity:0}to{transform:translateX(0);opacity:1}}
+    .empty-state{text-align:center;padding:3.5rem 1rem;color:var(--muted);}
+    .empty-state i{font-size:3rem;opacity:.4;}
+    .stat-chip{background:var(--brand-light);color:var(--brand);border-radius:8px;padding:.28rem .75rem;font-size:.8rem;font-weight:700;}
+    .stat-chip-green{background:#f0fdf4;color:#059669;border-radius:8px;padding:.28rem .75rem;font-size:.8rem;font-weight:700;}
+    .btn{border-radius:8px;font-weight:600;font-size:.86rem;}
+    .btn-brand{background:var(--brand);color:white;border:none;}
+    .btn-brand:hover{background:var(--brand-dark);color:white;}
+    .near-me-card{background:white;border-radius:12px;border:2px solid #dbeafe;padding:2rem;text-align:center;max-width:500px;margin:0 auto;}
+    .toggle-type{display:flex;background:#f1f5f9;border-radius:10px;padding:4px;gap:4px;margin-bottom:1.5rem;}
+    .toggle-btn{flex:1;padding:.55rem;border:none;border-radius:8px;font-weight:600;font-size:.86rem;cursor:pointer;transition:all .2s;background:transparent;color:var(--muted);}
+    .toggle-btn.active{background:white;color:var(--brand);box-shadow:0 2px 6px rgba(0,0,0,.1);}
+    @media(max-width:576px){.header-brand h1{font-size:1.1rem;}.app-tabs .nav-link{font-size:.72rem;padding:.45rem .55rem;}}
   </style>
 </head>
 <body>
-
 <div id="toast-container"></div>
 <div id="root"></div>
-
 <script type="text/babel">
 // ================================================================
-//  CONFIG  —  Replace with your Supabase project credentials
+//  CONFIG
 // ================================================================
-const SUPABASE_URL     = 'https://vghtballxypwjgmicuki.supabase.co';
+const SUPABASE_URL      = 'https://vghtballxypwjgmicuki.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZnaHRiYWxseHlwd2pnbWljdWtpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODEwMDM1MTgsImV4cCI6MjA5NjU3OTUxOH0.7kNciLYJiNxHyYyrtEgu3jUQOAX4nPwPXg29UfzoT5s';
-const ADMIN_PASSWORD   = 'Admin123';   // Change before sharing!
-const APP_NAME         = 'Community Business Hub';  // Change app name here
-const COMMUNITY_NAME   = 'Jai Santaji';  // Change community name here
+const ADMIN_PASSWORD    = 'Admin123';
+const APP_NAME          = 'Community Business Hub';
+const COMMUNITY_NAME    = 'Jai Santaji';
 // ================================================================
 
-const SETUP_NEEDED = SUPABASE_URL === 'YOUR_SUPABASE_URL' || SUPABASE_ANON_KEY === 'YOUR_SUPABASE_ANON_KEY';
+const SETUP_NEEDED = SUPABASE_URL==='YOUR_SUPABASE_URL'||SUPABASE_ANON_KEY==='YOUR_SUPABASE_ANON_KEY';
 const sb = SETUP_NEEDED ? null : window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-const { useState, useEffect, useCallback, useRef } = React;
+const { useState, useEffect, useCallback } = React;
 
-// ---- Business Types ----
-const BIZ_TYPES = [
-  'Grocery / Kirana', 'Restaurant / Food', 'Clothing / Apparel',
-  'Electronics / Gadgets', 'Medical / Pharmacy', 'Hardware / Tools',
-  'Jewellery / Accessories', 'Real Estate / Property', 'Education / Coaching',
-  'Salon / Beauty / Spa', 'Automobile / Vehicles', 'Mobile / Computer Repair',
-  'Catering / Events', 'Photography / Videography', 'Transport / Logistics',
-  'Agriculture / Farming', 'Finance / CA / Banking', 'Legal / Consulting',
-  'Hotel / Lodge / PG', 'Manufacturing / Production', 'Stationery / Printing',
-  'Footwear', 'Furniture / Interior', 'Home Appliances', 'Gym / Fitness',
-  'Travel / Tours', 'Textile / Fabric', 'Plumbing / Electrical',
-  'Other'
+// ================================================================
+//  INDIA LOCATION DATA
+// ================================================================
+const INDIA_STATES = [
+  'Andhra Pradesh','Arunachal Pradesh','Assam','Bihar','Chhattisgarh','Goa','Gujarat',
+  'Haryana','Himachal Pradesh','Jharkhand','Karnataka','Kerala','Madhya Pradesh',
+  'Maharashtra','Manipur','Meghalaya','Mizoram','Nagaland','Odisha','Punjab',
+  'Rajasthan','Sikkim','Tamil Nadu','Telangana','Tripura','Uttar Pradesh',
+  'Uttarakhand','West Bengal','Andaman & Nicobar Islands','Chandigarh',
+  'Dadra & Nagar Haveli & Daman & Diu','Delhi','Jammu & Kashmir','Ladakh',
+  'Lakshadweep','Puducherry'
 ];
 
-// ---- Toast ----
-function showToast(msg, type = 'success') {
+const INDIA_CITIES = {
+  'Maharashtra': ['Ahmednagar','Akola','Akot','Amalner','Ambajogai','Amravati','Ambarnath',
+    'Aurangabad','Badlapur','Baramati','Barshi','Beed','Bhiwandi','Bhandara','Buldhana',
+    'Chandrapur','Chalisgaon','Chinchwad','Chopda','Daund','Dhule','Dombivli','Gadchiroli',
+    'Gondia','Hinganghat','Hingoli','Ichalkaranji','Igatpuri','Jalgaon','Jalna','Karad',
+    'Karjat','Khamgaon','Kolhapur','Kopargaon','Latur','Lonavala','Malegaon','Malkapur',
+    'Manmad','Mira-Bhayandar','Miraj','Mumbai','Nagpur','Nanded','Nandurbar','Nashik',
+    'Navi Mumbai','Osmanabad','Palghar','Pandharpur','Panvel','Parbhani','Phaltan','Pune',
+    'Pusad','Raigad','Ratnagiri','Sangamner','Sangli','Satara','Sawantwadi','Shegaon',
+    'Shirdi','Shirpur','Sindhudurg','Solapur','Thane','Udgir','Ulhasnagar','Vasai-Virar',
+    'Wai','Wardha','Washim','Yavatmal',
+    // Talukas
+    'Achalpur','Akkalkot','Akole','Alibag','Ambad','Ambegaon','Arvi','Ashti',
+    'Aundha Nagnath','Baglan','Balapur','Barshitakli','Basmath','Bhokardan','Biloli',
+    'Brahmapuri','Chakur','Chandur Bazar','Chamorshi','Chimur','Chikhaldara','Deglur',
+    'Deoni','Deulgaon Raja','Dhamangaon','Dharni','Dharur','Dindori','Etapalli',
+    'Gangakhed','Gangapur','Georai','Ghansawangi','Gondpipri','Hadgaon','Haveli',
+    'Indapur','Jafrabad','Jalgaon Jamod','Jamner','Junnar','Kaij','Kalamb','Kalwan',
+    'Kannad','Karanja','Khed','Khuldabad','Kinwat','Korchi','Korpana','Kurkheda',
+    'Loha','Lonar','Madha','Mahad','Mahagaon','Mahur','Majalgaon','Malshiras',
+    'Mangalvedha','Mangrulpir','Manora','Manwath','Morshi','Motala','Mukhed','Mul',
+    'Nagbhid','Nandgaon','Nandura','Narayangaon','Ner','Nevasa','Niphad','Paithan',
+    'Palus','Paranda','Parner','Pathardi','Pathri','Pauni','Phulambri','Purandar',
+    'Purna','Rahata','Rahuri','Rajgurunagar','Rajura','Renapur','Sailu','Sakoli',
+    'Sangole','Sangrampur','Sengaon','Seloo','Shirala','Shirur','Shirur Anantpal',
+    'Shirur Kasar','Shrirampur','Sillod','Sindewahi','Sironcha','Soegaon','Tasgaon',
+    'Tiwsa','Tumsar','Tuljapur','Umarga','Umred','Umarkhed','Vaijapur','Walwa',
+    'Wani','Wardha City','Warora','Warud'].sort(),
+  'Gujarat': ['Ahmedabad','Amreli','Anand','Ankleshwar','Bardoli','Bharuch','Bhavnagar',
+    'Bhuj','Deesa','Gandhidham','Gandhinagar','Gondal','Jamnagar','Jetpur','Junagadh',
+    'Kadi','Kalol','Kapadvanj','Kutch','Limdi','Mehsana','Morbi','Nadiad','Navsari',
+    'Palanpur','Porbandar','Rajkot','Rajpipla','Surat','Surendranagar','Upleta','Vadodara',
+    'Vapi','Veraval','Visnagar','Vyara'].sort(),
+  'Delhi': ['Central Delhi','Dwarka','East Delhi','Janakpuri','Karol Bagh','Lajpat Nagar',
+    'New Delhi','Nehru Place','North Delhi','North East Delhi','North West Delhi',
+    'Pitampura','Rohini','Saket','Shahdara','South Delhi','South East Delhi',
+    'South West Delhi','West Delhi'].sort(),
+  'Karnataka': ['Bagalkot','Ballari','Belagavi','Bengaluru Rural','Bengaluru Urban',
+    'Bidar','Chamarajanagar','Chikkaballapur','Chikkamagaluru','Chitradurga',
+    'Dakshina Kannada','Davangere','Dharwad','Gadag','Hassan','Haveri','Hospet',
+    'Hubli','Kalaburagi','Kodagu','Kolar','Koppal','Mandya','Mangaluru','Mysuru',
+    'Raichur','Ramanagara','Shivamogga','Tumakuru','Udupi','Uttara Kannada','Vijayapura','Yadgir'].sort(),
+  'Tamil Nadu': ['Ariyalur','Chengalpattu','Chennai','Coimbatore','Cuddalore','Dharmapuri',
+    'Dindigul','Erode','Kallakurichi','Kanchipuram','Kanyakumari','Karur','Krishnagiri',
+    'Madurai','Nagapattinam','Namakkal','Nilgiris','Perambalur','Pudukkottai',
+    'Ramanathapuram','Ranipet','Salem','Sivaganga','Tenkasi','Thanjavur','Theni',
+    'Thoothukudi','Tiruchirappalli','Tirunelveli','Tiruppur','Tiruvallur',
+    'Tiruvannamalai','Vellore','Viluppuram','Virudhunagar'].sort(),
+  'Uttar Pradesh': ['Agra','Aligarh','Allahabad','Amroha','Azamgarh','Bahraich','Ballia',
+    'Banda','Barabanki','Bareilly','Basti','Bijnor','Budaun','Bulandshahr','Deoria',
+    'Etah','Etawah','Farrukhabad','Fatehpur','Firozabad','Gautam Buddha Nagar',
+    'Ghaziabad','Ghazipur','Gonda','Gorakhpur','Hardoi','Hathras','Jaunpur','Jhansi',
+    'Kanpur','Kasganj','Kushinagar','Lakhimpur Kheri','Lalitpur','Lucknow','Mathura',
+    'Meerut','Mirzapur','Moradabad','Muzaffarnagar','Noida','Pilibhit','Prayagraj',
+    'Raebareli','Rampur','Saharanpur','Sambhal','Shahjahanpur','Sitapur','Sultanpur',
+    'Unnao','Varanasi'].sort(),
+  'Rajasthan': ['Ajmer','Alwar','Banswara','Barmer','Bharatpur','Bhilwara','Bikaner',
+    'Bundi','Chittorgarh','Churu','Dausa','Dholpur','Dungarpur','Ganganagar',
+    'Hanumangarh','Jaipur','Jaisalmer','Jalore','Jhalawar','Jhunjhunu','Jodhpur',
+    'Karauli','Kishangarh','Kota','Nagaur','Pali','Pratapgarh','Rajsamand',
+    'Sawai Madhopur','Sikar','Sirohi','Tonk','Udaipur'].sort(),
+  'Madhya Pradesh': ['Alirajpur','Anuppur','Ashoknagar','Balaghat','Betul','Bhind',
+    'Bhopal','Burhanpur','Chhatarpur','Chhindwara','Damoh','Datia','Dewas','Dhar',
+    'Dindori','Guna','Gwalior','Harda','Hoshangabad','Indore','Jabalpur','Jhabua',
+    'Katni','Khandwa','Khargone','Mandla','Mandsaur','Morena','Narsimhapur','Neemuch',
+    'Panna','Raisen','Rajgarh','Ratlam','Rewa','Sagar','Satna','Sehore','Seoni',
+    'Shahdol','Sheopur','Shivpuri','Sidhi','Singrauli','Tikamgarh','Ujjain','Vidisha'].sort(),
+  'West Bengal': ['Alipurduar','Bankura','Birbhum','Cooch Behar','Darjeeling','Hooghly',
+    'Howrah','Jalpaiguri','Jhargram','Kolkata','Maldah','Murshidabad','Nadia',
+    'North 24 Parganas','Paschim Bardhaman','Paschim Medinipur','Purba Bardhaman',
+    'Purba Medinipur','Purulia','South 24 Parganas','Uttar Dinajpur'].sort(),
+  'Bihar': ['Araria','Arwal','Aurangabad','Banka','Begusarai','Bhagalpur','Bhojpur',
+    'Buxar','Darbhanga','East Champaran','Gaya','Gopalganj','Jamui','Jehanabad',
+    'Kaimur','Katihar','Khagaria','Kishanganj','Lakhisarai','Madhepura','Madhubani',
+    'Munger','Muzaffarpur','Nalanda','Nawada','Patna','Purnia','Rohtas','Saharsa',
+    'Samastipur','Saran','Sitamarhi','Siwan','Supaul','Vaishali','West Champaran'].sort(),
+  'Telangana': ['Adilabad','Bhadradri Kothagudem','Hanamkonda','Hyderabad','Jagtial',
+    'Jangaon','Jogulamba Gadwal','Kamareddy','Karimnagar','Khammam','Komaram Bheem',
+    'Mahabubabad','Mahbubnagar','Mancherial','Medak','Medchal','Mulugu','Nagarkurnool',
+    'Nalgonda','Narayanpet','Nirmal','Nizamabad','Peddapalli','Rajanna Sircilla',
+    'Rangareddy','Sangareddy','Secunderabad','Siddipet','Suryapet','Vikarabad',
+    'Wanaparthy','Warangal'].sort(),
+  'Andhra Pradesh': ['Ananthapuramu','Chittoor','East Godavari','Eluru','Guntur','Kadapa',
+    'Kakinada','Krishnapatnam','Kurnool','Nandyal','Nellore','Srikakulam','Tirupati',
+    'Visakhapatnam','Vizianagaram','West Godavari'].sort(),
+  'Punjab': ['Amritsar','Barnala','Bathinda','Faridkot','Fatehgarh Sahib','Fazilka',
+    'Ferozepur','Gurdaspur','Hoshiarpur','Jalandhar','Kapurthala','Ludhiana','Mansa',
+    'Moga','Mohali','Muktsar','Nawanshahr','Pathankot','Patiala','Rupnagar','Sangrur',
+    'Tarn Taran'].sort(),
+  'Haryana': ['Ambala','Bhiwani','Charkhi Dadri','Faridabad','Fatehabad','Gurugram',
+    'Hisar','Jhajjar','Jind','Kaithal','Karnal','Kurukshetra','Mahendragarh',
+    'Mewat','Palwal','Panchkula','Panipat','Rewari','Rohtak','Sirsa','Sonipat','Yamunanagar'].sort(),
+  'Kerala': ['Alappuzha','Ernakulam','Idukki','Kannur','Kasaragod','Kochi','Kollam',
+    'Kottayam','Kozhikode','Malappuram','Palakkad','Pathanamthitta','Thiruvananthapuram',
+    'Thrissur','Wayanad'].sort(),
+  'Goa': ['Bicholim','Calangute','Candolim','Curchorem','Margao','Mapusa','Mormugao',
+    'North Goa','Panaji','Ponda','Quepem','Salcete','South Goa','Vasco da Gama'].sort(),
+  'Himachal Pradesh': ['Bilaspur','Chamba','Dharamshala','Hamirpur','Kangra','Kinnaur',
+    'Kullu','Lahaul and Spiti','Mandi','Manali','Shimla','Sirmaur','Solan','Una'].sort(),
+  'Uttarakhand': ['Almora','Bageshwar','Chamoli','Champawat','Dehradun','Haridwar',
+    'Haldwani','Kashipur','Kotdwar','Nainital','Pauri','Pithoragarh','Ramnagar',
+    'Rishikesh','Roorkee','Rudraprayag','Rudrapur','Tehri','Uttarkashi'].sort(),
+  'Jharkhand': ['Bokaro','Chatra','Deoghar','Dhanbad','Dumka','East Singhbhum',
+    'Garhwa','Giridih','Godda','Gumla','Hazaribagh','Jamtara','Jamshedpur','Khunti',
+    'Koderma','Latehar','Lohardaga','Pakur','Palamu','Ramgarh','Ranchi','Sahebganj',
+    'Seraikela','Simdega','West Singhbhum'].sort(),
+  'Chhattisgarh': ['Balod','Baloda Bazar','Balrampur','Bastar','Bemetara','Bhilai',
+    'Bijapur','Bilaspur','Dantewada','Dhamtari','Durg','Gariaband','Janjgir','Jashpur',
+    'Kabirdham','Kanker','Kondagaon','Korba','Koriya','Mahasamund','Mungeli',
+    'Narayanpur','Raigarh','Raipur','Rajnandgaon','Sukma','Surajpur','Surguja'].sort(),
+  'Odisha': ['Angul','Balangir','Balasore','Bargarh','Bhadrak','Bhubaneswar','Boudh',
+    'Cuttack','Deogarh','Dhenkanal','Gajapati','Ganjam','Jagatsinghpur','Jajpur',
+    'Jharsuguda','Kalahandi','Kendrapara','Kendujhar','Khordha','Koraput','Malkangiri',
+    'Mayurbhanj','Nabarangpur','Nayagarh','Nuapada','Puri','Rayagada','Sambalpur',
+    'Sundergarh'].sort(),
+  'Assam': ['Baksa','Barpeta','Biswanath','Bongaigaon','Cachar','Darrang','Dhemaji',
+    'Dhubri','Dibrugarh','Dima Hasao','Goalpara','Golaghat','Guwahati','Hailakandi',
+    'Hojai','Jorhat','Kamrup','Kamrup Metropolitan','Karbi Anglong','Karimganj',
+    'Kokrajhar','Lakhimpur','Majuli','Morigaon','Nagaon','Nalbari','Sivasagar',
+    'Sonitpur','Tinsukia','Udalguri'].sort(),
+};
+
+// ================================================================
+//  BUSINESS TYPES & JOB FIELDS
+// ================================================================
+const BIZ_TYPES = [
+  // Professionals
+  'Doctor / Medical Practitioner','Hospital / Clinic','CA / Chartered Accountant',
+  'Architect','Civil / Structural Engineer','Advocate / Lawyer',
+  'Financial Advisor / Planner','Interior Designer','Consultant',
+  // Retail
+  'Grocery / Kirana','Restaurant / Food','Clothing / Apparel','Footwear',
+  'Jewellery / Accessories','Textile / Fabric','Stationery / Printing',
+  'Home Appliances','Furniture / Interior',
+  // Services
+  'Medical / Pharmacy','Salon / Beauty / Spa','Gym / Fitness',
+  'Education / Coaching','Catering / Events','Photography / Videography',
+  'Transport / Logistics','Travel / Tours','Hotel / Lodge / PG',
+  // Technical
+  'Electronics / Gadgets','Mobile / Computer Repair',
+  'Plumbing / Electrical','Automobile / Vehicles','Hardware / Tools',
+  // Others
+  'Real Estate / Property','Agriculture / Farming','Finance / Banking',
+  'Manufacturing / Production','Other'
+];
+
+const JOB_FIELDS = [
+  'Information Technology (IT)','Banking & Finance','Medical / Healthcare',
+  'Government / PSU','Education / Teaching','Engineering',
+  'Manufacturing / Industry','Legal / Law','Media / Journalism',
+  'Defence / Armed Forces','Real Estate','Retail / Trade',
+  'Hospitality / Tourism','Transportation / Logistics','Agriculture',
+  'Insurance','Telecom','Pharma / Life Sciences','Automobile','Other'
+];
+
+// ================================================================
+//  TOAST
+// ================================================================
+function showToast(msg, type='success') {
   const c = document.getElementById('toast-container');
   const el = document.createElement('div');
   el.className = `toast-item toast-${type}`;
-  el.innerHTML = `<i class="bi bi-${type === 'success' ? 'check-circle' : type === 'error' ? 'x-circle' : 'info-circle'} me-2"></i>${msg}`;
+  el.innerHTML = `<i class="bi bi-${type==='success'?'check-circle':type==='error'?'x-circle':'info-circle'} me-2"></i>${msg}`;
   c.appendChild(el);
-  setTimeout(() => { el.style.opacity = '0'; el.style.transition = 'opacity 0.4s'; setTimeout(() => el.remove(), 400); }, 3000);
+  setTimeout(()=>{el.style.opacity='0';el.style.transition='opacity .4s';setTimeout(()=>el.remove(),400);},3000);
 }
 
 // ================================================================
-//  ROOT APP
+//  SETUP SCREEN
 // ================================================================
 function SetupScreen() {
   return (
     <div style={{minHeight:'100vh',background:'#f1f5f9',display:'flex',alignItems:'center',justifyContent:'center',padding:'1rem'}}>
-      <div style={{background:'white',borderRadius:'16px',boxShadow:'0 4px 24px rgba(0,0,0,0.1)',padding:'2.5rem',maxWidth:'520px',width:'100%'}}>
+      <div style={{background:'white',borderRadius:'16px',boxShadow:'0 4px 24px rgba(0,0,0,.1)',padding:'2.5rem',maxWidth:'520px',width:'100%'}}>
         <div style={{textAlign:'center',marginBottom:'1.5rem'}}>
-          <div style={{fontSize:'3rem',marginBottom:'0.5rem'}}>⚙️</div>
+          <div style={{fontSize:'3rem'}}>⚙️</div>
           <h4 style={{fontWeight:700,color:'#1e293b',margin:0}}>Setup Required</h4>
-          <p style={{color:'#64748b',marginTop:'0.5rem',fontSize:'0.9rem'}}>
-            Connect your Supabase database to launch the app.
-          </p>
+          <p style={{color:'#64748b',marginTop:'.5rem',fontSize:'.9rem'}}>Connect your Supabase database to launch the app.</p>
         </div>
-        <ol style={{color:'#334155',fontSize:'0.9rem',lineHeight:'2'}}>
+        <ol style={{color:'#334155',fontSize:'.9rem',lineHeight:'2'}}>
           <li>Go to <strong>supabase.com</strong> → create a free project</li>
-          <li>Run the <strong>supabase_setup.sql</strong> file in the SQL Editor</li>
-          <li>Go to <strong>Settings → API</strong> and copy your Project URL and anon key</li>
-          <li>Open <strong>index.html</strong> in a text editor and update these lines:</li>
+          <li>Run <strong>supabase_setup.sql</strong> in the SQL Editor</li>
+          <li>Go to <strong>Settings → API</strong> and copy Project URL and anon key</li>
+          <li>Open <strong>index.html</strong> and update the CONFIG section at the top</li>
         </ol>
-        <div style={{background:'#1e293b',borderRadius:'10px',padding:'1rem',fontFamily:'monospace',fontSize:'0.82rem',color:'#e2e8f0',marginTop:'0.5rem'}}>
-          <div><span style={{color:'#94a3b8'}}>// Line ~191</span></div>
-          <div>const SUPABASE_URL = <span style={{color:'#86efac'}}>'https://xxxx.supabase.co'</span>;</div>
-          <div>const SUPABASE_ANON_KEY = <span style={{color:'#86efac'}}>'eyJ...'</span>;</div>
-          <div style={{marginTop:'0.5rem'}}><span style={{color:'#94a3b8'}}>// Optional</span></div>
-          <div>const ADMIN_PASSWORD = <span style={{color:'#86efac'}}>'YourPassword'</span>;</div>
-        </div>
-        <p style={{fontSize:'0.8rem',color:'#94a3b8',marginTop:'1rem',textAlign:'center'}}>
-          Save the file and refresh the browser — the app will load.
-        </p>
       </div>
     </div>
   );
 }
 
+// ================================================================
+//  LOCATION SELECTOR (reusable State + City dropdowns)
+// ================================================================
+function LocationSelector({ state, city, onStateChange, onCityChange, errors={} }) {
+  const cities = INDIA_CITIES[state] || [];
+  const cityId = 'cities_' + Math.random().toString(36).substr(2,5);
+  return (
+    <div className="row g-3">
+      <div className="col-md-4">
+        <label className="form-label">State <span className="text-danger">*</span></label>
+        <select className={`form-select ${errors.state?'is-invalid':''}`}
+          value={state} onChange={e=>{onStateChange(e.target.value);onCityChange('');}}>
+          <option value="">Select State...</option>
+          {INDIA_STATES.map(s=><option key={s} value={s}>{s}</option>)}
+        </select>
+        {errors.state && <div className="invalid-feedback">{errors.state}</div>}
+      </div>
+      <div className="col-md-4">
+        <label className="form-label">City / Taluka / District <span className="text-danger">*</span></label>
+        <input list={cityId} className={`form-control ${errors.city?'is-invalid':''}`}
+          placeholder={state?'Type or select city...':'Select state first'}
+          value={city} onChange={e=>onCityChange(e.target.value)} disabled={!state} />
+        <datalist id={cityId}>
+          {cities.map(c=><option key={c} value={c}/>)}
+        </datalist>
+        {errors.city && <div className="invalid-feedback">{errors.city}</div>}
+      </div>
+      <div className="col-md-4">
+        <label className="form-label">Country <span className="text-danger">*</span></label>
+        <input className={`form-control ${errors.country?'is-invalid':''}`}
+          value="India" readOnly style={{background:'#f8fafc'}} />
+      </div>
+    </div>
+  );
+}
+
+// ================================================================
+//  ROOT APP
+// ================================================================
 function App() {
   if (SETUP_NEEDED) return <SetupScreen />;
 
-  const [tab, setTab]             = useState('directory');
-  const [businesses, setBusinesses] = useState([]);
-  const [loading, setLoading]     = useState(true);
-  const [isAdmin, setIsAdmin]     = useState(false);
+  const [tab, setTab]         = useState('directory');
+  const [listings, setListings] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [isAdmin, setIsAdmin] = useState(false);
 
   const fetchAll = useCallback(async () => {
     setLoading(true);
-    const { data, error } = await sb.from('businesses').select('*').order('created_at', { ascending: false });
-    if (!error) setBusinesses(data || []);
-    else showToast('Failed to load listings', 'error');
+    const { data, error } = await sb.from('businesses').select('*').order('created_at',{ascending:false});
+    if (!error) setListings(data||[]);
+    else showToast('Failed to load listings','error');
     setLoading(false);
-  }, []);
+  },[]);
 
-  useEffect(() => { fetchAll(); }, [fetchAll]);
+  useEffect(()=>{fetchAll();},[fetchAll]);
+
+  const bizCount = listings.filter(l=>l.listing_type!=='job').length;
+  const jobCount = listings.filter(l=>l.listing_type==='job').length;
+
+  const TABS = [
+    {id:'directory',  icon:'bi-grid-3x3-gap', label:'Directory'},
+    {id:'register',   icon:'bi-plus-circle',   label:'Register'},
+    {id:'mylisting',  icon:'bi-pencil-square', label:'My Listing'},
+    {id:'nearme',     icon:'bi-geo-alt',        label:'Near Me'},
+    {id:'admin',      icon:'bi-shield-lock',    label:'Admin'},
+  ];
 
   return (
     <div>
-      {/* HEADER */}
       <header className="app-header">
         <div className="container">
           <div className="d-flex align-items-center justify-content-between pb-1">
             <div className="header-brand">
               <h1><i className="bi bi-buildings me-2"></i>{APP_NAME}</h1>
-              <p>{COMMUNITY_NAME} — Find local businesses near you</p>
+              <p>{COMMUNITY_NAME} — Find businesses &amp; professionals near you</p>
             </div>
-            <div className="text-end d-none d-sm-block">
-              <div className="header-badge text-white">
-                <i className="bi bi-shop me-1"></i>
-                <strong>{businesses.length}</strong> Businesses Listed
-              </div>
+            <div className="d-none d-sm-flex gap-2">
+              <div className="header-badge text-white"><i className="bi bi-shop me-1"></i><strong>{bizCount}</strong> Businesses</div>
+              <div className="header-badge text-white"><i className="bi bi-briefcase me-1"></i><strong>{jobCount}</strong> Professionals</div>
             </div>
           </div>
-
-          {/* NAV TABS */}
-          <ul className="nav app-tabs">
-            {[
-              { id: 'directory',   icon: 'bi-grid-3x3-gap', label: 'Directory' },
-              { id: 'register',    icon: 'bi-plus-circle',   label: 'Register Business' },
-              { id: 'mybusiness',  icon: 'bi-pencil-square', label: 'My Business' },
-              { id: 'admin',       icon: 'bi-shield-lock',   label: 'Admin' },
-            ].map(t => (
+          <ul className="nav app-tabs overflow-auto flex-nowrap">
+            {TABS.map(t=>(
               <li className="nav-item" key={t.id}>
-                <button
-                  className={`nav-link ${tab === t.id ? 'active' : ''}`}
-                  onClick={() => setTab(t.id)}
-                >
-                  <i className={`bi ${t.icon} me-1`}></i>
-                  {t.label}
-                  {t.id === 'admin' && isAdmin && (
-                    <span className="badge bg-success ms-1" style={{fontSize:'0.6rem'}}>ON</span>
-                  )}
+                <button className={`nav-link ${tab===t.id?'active':''}`} onClick={()=>setTab(t.id)}>
+                  <i className={`bi ${t.icon} me-1`}></i>{t.label}
+                  {t.id==='admin'&&isAdmin&&<span className="badge bg-success ms-1" style={{fontSize:'.6rem'}}>ON</span>}
                 </button>
               </li>
             ))}
@@ -319,19 +379,12 @@ function App() {
         </div>
       </header>
 
-      {/* PAGE CONTENT */}
       <main className="container py-4">
-        {tab === 'directory'  && <DirectoryTab businesses={businesses} loading={loading} />}
-        {tab === 'register'   && <RegisterTab onSuccess={() => { fetchAll(); setTab('directory'); }} />}
-        {tab === 'mybusiness' && <MyBusinessTab businesses={businesses} onRefresh={fetchAll} />}
-        {tab === 'admin'      && (
-          <AdminTab
-            businesses={businesses}
-            onRefresh={fetchAll}
-            isAdmin={isAdmin}
-            setIsAdmin={setIsAdmin}
-          />
-        )}
+        {tab==='directory'  && <DirectoryTab listings={listings} loading={loading} />}
+        {tab==='register'   && <RegisterTab onSuccess={()=>{fetchAll();setTab('directory');}} />}
+        {tab==='mylisting'  && <MyListingTab onRefresh={fetchAll} />}
+        {tab==='nearme'     && <NearMeTab listings={listings} />}
+        {tab==='admin'      && <AdminTab listings={listings} onRefresh={fetchAll} isAdmin={isAdmin} setIsAdmin={setIsAdmin} />}
       </main>
     </div>
   );
@@ -340,119 +393,114 @@ function App() {
 // ================================================================
 //  DIRECTORY TAB
 // ================================================================
-function DirectoryTab({ businesses, loading }) {
-  const [q,           setQ]           = useState('');
-  const [fType,       setFType]       = useState('');
-  const [fCity,       setFCity]       = useState('');
-  const [fState,      setFState]      = useState('');
-  const [fCountry,    setFCountry]    = useState('');
+function DirectoryTab({ listings, loading }) {
+  const [view,    setView]    = useState('all');   // all | business | job
+  const [q,       setQ]       = useState('');
+  const [fType,   setFType]   = useState('');
+  const [fCity,   setFCity]   = useState('');
+  const [fState,  setFState]  = useState('');
 
-  const cities     = [...new Set(businesses.map(b => b.city).filter(Boolean))].sort();
-  const states     = [...new Set(businesses.map(b => b.state).filter(Boolean))].sort();
-  const countries  = [...new Set(businesses.map(b => b.country).filter(Boolean))].sort();
+  const cities  = [...new Set(listings.map(b=>b.city).filter(Boolean))].sort();
+  const states  = [...new Set(listings.map(b=>b.state).filter(Boolean))].sort();
 
-  const filtered = businesses.filter(b => {
+  const filtered = listings.filter(b=>{
+    const isJob = b.listing_type==='job';
+    if (view==='business' && isJob) return false;
+    if (view==='job' && !isJob) return false;
     const lq = q.toLowerCase();
     return (
-      (!lq || [b.owner_name, b.business_name, b.business_type, b.city, b.address]
-        .some(v => v?.toLowerCase().includes(lq))) &&
-      (!fType    || b.business_type === fType) &&
-      (!fCity    || b.city === fCity) &&
-      (!fState   || b.state === fState) &&
-      (!fCountry || b.country === fCountry)
+      (!lq||[b.owner_name,b.business_name,b.business_type,b.city,b.designation]
+        .some(v=>v?.toLowerCase().includes(lq))) &&
+      (!fType  || b.business_type===fType) &&
+      (!fCity  || b.city===fCity) &&
+      (!fState || b.state===fState)
     );
   });
 
-  const clear = () => { setQ(''); setFType(''); setFCity(''); setFState(''); setFCountry(''); };
-  const dirty = q || fType || fCity || fState || fCountry;
+  const clear = ()=>{setQ('');setFType('');setFCity('');setFState('');};
+  const dirty = q||fType||fCity||fState;
 
   return (
     <div>
-      {/* Search + Filters */}
       <div className="search-section">
+        {/* View Toggle */}
+        <div className="d-flex gap-2 mb-3 flex-wrap">
+          {[['all','All Listings'],['business','Businesses'],['job','Working Professionals']].map(([v,l])=>(
+            <button key={v} className={`btn btn-sm ${view===v?'btn-brand':'btn-outline-secondary'}`}
+              onClick={()=>setView(v)}>{l}</button>
+          ))}
+        </div>
         <div className="row g-2 align-items-end">
           <div className="col-12 col-lg-4">
             <div className="search-label"><i className="bi bi-search me-1"></i>Search</div>
             <div className="input-group">
               <span className="input-group-text bg-white border-end-0 text-muted"><i className="bi bi-search"></i></span>
-              <input
-                type="text"
-                className="form-control border-start-0 ps-1"
+              <input type="text" className="form-control border-start-0 ps-1"
                 placeholder="Name, business, type, city..."
-                value={q}
-                onChange={e => setQ(e.target.value)}
-              />
-              {q && (
-                <button className="btn btn-outline-secondary border-start-0" onClick={() => setQ('')}>
-                  <i className="bi bi-x"></i>
-                </button>
-              )}
+                value={q} onChange={e=>setQ(e.target.value)} />
+              {q&&<button className="btn btn-outline-secondary border-start-0" onClick={()=>setQ('')}><i className="bi bi-x"></i></button>}
             </div>
           </div>
-          <div className="col-6 col-md-3 col-lg-2">
-            <div className="search-label"><i className="bi bi-tags me-1"></i>Type</div>
-            <select className="form-select" value={fType} onChange={e => setFType(e.target.value)}>
+          <div className="col-6 col-md-3 col-lg-3">
+            <div className="search-label"><i className="bi bi-tags me-1"></i>Type / Field</div>
+            <select className="form-select" value={fType} onChange={e=>setFType(e.target.value)}>
               <option value="">All Types</option>
-              {BIZ_TYPES.map(t => <option key={t} value={t}>{t}</option>)}
+              {[...BIZ_TYPES,...JOB_FIELDS].filter((v,i,a)=>a.indexOf(v)===i).sort()
+                .map(t=><option key={t} value={t}>{t}</option>)}
             </select>
           </div>
           <div className="col-6 col-md-3 col-lg-2">
             <div className="search-label"><i className="bi bi-building me-1"></i>City</div>
-            <select className="form-select" value={fCity} onChange={e => setFCity(e.target.value)}>
+            <select className="form-select" value={fCity} onChange={e=>setFCity(e.target.value)}>
               <option value="">All Cities</option>
-              {cities.map(c => <option key={c} value={c}>{c}</option>)}
+              {cities.map(c=><option key={c} value={c}>{c}</option>)}
             </select>
           </div>
           <div className="col-6 col-md-3 col-lg-2">
             <div className="search-label"><i className="bi bi-map me-1"></i>State</div>
-            <select className="form-select" value={fState} onChange={e => setFState(e.target.value)}>
+            <select className="form-select" value={fState} onChange={e=>setFState(e.target.value)}>
               <option value="">All States</option>
-              {states.map(s => <option key={s} value={s}>{s}</option>)}
-            </select>
-          </div>
-          <div className="col-6 col-md-3 col-lg-2">
-            <div className="search-label"><i className="bi bi-globe me-1"></i>Country</div>
-            <select className="form-select" value={fCountry} onChange={e => setFCountry(e.target.value)}>
-              <option value="">All Countries</option>
-              {countries.map(c => <option key={c} value={c}>{c}</option>)}
+              {states.map(s=><option key={s} value={s}>{s}</option>)}
             </select>
           </div>
         </div>
-
-        {dirty && (
+        {dirty&&(
           <div className="mt-2 d-flex align-items-center gap-2">
             <button className="btn btn-sm btn-outline-secondary" onClick={clear}>
               <i className="bi bi-x-circle me-1"></i>Clear Filters
             </button>
-            <span className="text-muted small">
-              Showing <strong>{filtered.length}</strong> of {businesses.length} listings
-            </span>
+            <span className="text-muted small">Showing <strong>{filtered.length}</strong> of {listings.length}</span>
           </div>
         )}
       </div>
 
-      {/* Results */}
       {loading ? (
         <div className="text-center py-5">
           <div className="spinner-border text-primary" style={{width:'2.5rem',height:'2.5rem'}}></div>
-          <p className="mt-3 text-muted">Loading businesses...</p>
+          <p className="mt-3 text-muted">Loading...</p>
         </div>
-      ) : filtered.length === 0 ? (
+      ) : filtered.length===0 ? (
         <div className="empty-state">
-          <i className="bi bi-shop-window"></i>
-          <h5 className="mt-3 fw-semibold">No businesses found</h5>
-          <p className="text-muted">
-            {dirty ? 'Try adjusting your search or filters.' : 'Be the first to register your business!'}
-          </p>
-          {dirty && <button className="btn btn-outline-primary btn-sm mt-1" onClick={clear}>Clear Filters</button>}
+          <i className="bi bi-search"></i>
+          <h5 className="mt-3 fw-semibold">No listings found</h5>
+          <p className="text-muted">{dirty?'Try different search or filters.':'Be the first to register!'}</p>
         </div>
       ) : (
         <>
-          <div className="d-flex align-items-center gap-2 mb-3">
-            <span className="stat-chip"><i className="bi bi-grid me-1"></i>{filtered.length} businesses</span>
+          <div className="d-flex gap-2 mb-3 flex-wrap">
+            <span className="stat-chip"><i className="bi bi-grid me-1"></i>
+              {filtered.filter(b=>b.listing_type!=='job').length} Businesses
+            </span>
+            <span className="stat-chip-green"><i className="bi bi-briefcase me-1"></i>
+              {filtered.filter(b=>b.listing_type==='job').length} Professionals
+            </span>
           </div>
           <div className="row g-3">
-            {filtered.map(b => <div key={b.id} className="col-12 col-sm-6 col-xl-4"><BizCard b={b} /></div>)}
+            {filtered.map(b=>(
+              <div key={b.id} className="col-12 col-sm-6 col-xl-4">
+                {b.listing_type==='job' ? <JobCard b={b}/> : <BizCard b={b}/>}
+              </div>
+            ))}
           </div>
         </>
       )}
@@ -471,23 +519,47 @@ function BizCard({ b }) {
       </div>
       <div className="p-3">
         <div className="biz-info"><i className="bi bi-person-fill"></i> {b.owner_name}</div>
-        <div className="biz-info">
-          <i className="bi bi-telephone-fill"></i>
+        <div className="biz-info"><i className="bi bi-telephone-fill"></i>
           <a href={`tel:${b.contact}`} className="text-decoration-none text-muted ms-1">{b.contact}</a>
         </div>
-        {b.address && (
-          <div className="biz-info"><i className="bi bi-geo-alt-fill"></i> {b.address}</div>
-        )}
-        <div className="biz-info">
-          <i className="bi bi-pin-map-fill"></i>{' '}
-          {[b.city, b.state, b.country].filter(Boolean).join(', ')}
-        </div>
+        {b.address&&<div className="biz-info"><i className="bi bi-geo-alt-fill"></i> {b.address}</div>}
+        <div className="biz-info"><i className="bi bi-pin-map-fill"></i> {[b.city,b.state].filter(Boolean).join(', ')}</div>
         <div className="mt-2 pt-2 border-top d-flex justify-content-between align-items-center">
-          <small className="text-muted" style={{fontSize:'0.74rem'}}>
-            <i className="bi bi-calendar3 me-1"></i>
-            {new Date(b.created_at).toLocaleDateString('en-IN', {day:'numeric', month:'short', year:'numeric'})}
+          <small className="text-muted" style={{fontSize:'.73rem'}}>
+            <i className="bi bi-calendar3 me-1"></i>{new Date(b.created_at).toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'})}
           </small>
-          <a href={`tel:${b.contact}`} className="btn btn-sm btn-brand px-3 py-1" style={{fontSize:'0.78rem'}}>
+          <a href={`tel:${b.contact}`} className="btn btn-sm btn-brand px-3 py-1" style={{fontSize:'.76rem'}}>
+            <i className="bi bi-telephone me-1"></i>Call
+          </a>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function JobCard({ b }) {
+  return (
+    <div className="biz-card">
+      <div className="job-card-header">
+        <div className="d-flex justify-content-between align-items-start gap-2">
+          <div>
+            <h6 className="biz-name"><i className="bi bi-person-badge me-1 text-success"></i>{b.owner_name}</h6>
+            {b.designation&&<div style={{fontSize:'.8rem',color:'#059669',fontWeight:600}}>{b.designation}</div>}
+          </div>
+          <span className="job-badge flex-shrink-0">{b.business_type}</span>
+        </div>
+      </div>
+      <div className="p-3">
+        {b.business_name&&<div className="biz-info"><i className="bi bi-building" style={{color:'#059669'}}></i> {b.business_name}</div>}
+        <div className="biz-info"><i className="bi bi-telephone-fill"></i>
+          <a href={`tel:${b.contact}`} className="text-decoration-none text-muted ms-1">{b.contact}</a>
+        </div>
+        <div className="biz-info"><i className="bi bi-pin-map-fill"></i> {[b.city,b.state].filter(Boolean).join(', ')}</div>
+        <div className="mt-2 pt-2 border-top d-flex justify-content-between align-items-center">
+          <small className="text-muted" style={{fontSize:'.73rem'}}>
+            <i className="bi bi-calendar3 me-1"></i>{new Date(b.created_at).toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'})}
+          </small>
+          <a href={`tel:${b.contact}`} className="btn btn-sm btn-sm px-3 py-1" style={{fontSize:'.76rem',background:'#059669',color:'white',borderRadius:'8px',fontWeight:600}}>
             <i className="bi bi-telephone me-1"></i>Call
           </a>
         </div>
@@ -497,188 +569,477 @@ function BizCard({ b }) {
 }
 
 // ================================================================
-//  REGISTER TAB
+//  REGISTER TAB  (Business + Job toggle)
 // ================================================================
-const EMPTY_FORM = {
-  owner_name: '', business_name: '', contact: '', business_type: '',
-  address: '', city: '', state: '', country: '', edit_pin: '', confirm_pin: ''
-};
-
 function RegisterTab({ onSuccess }) {
-  const [form, setForm] = useState({...EMPTY_FORM});
-  const [errors, setErrors] = useState({});
-  const [busy, setBusy] = useState(false);
-  const [showPin, setShowPin] = useState(false);
+  const [mode, setMode] = useState('business');
+  return (
+    <div className="form-wrap">
+      <div className="card-clean p-4">
+        <h5 className="fw-bold mb-1"><i className="bi bi-plus-circle-fill me-2 text-primary"></i>Register in Directory</h5>
+        <p className="text-muted small mb-3">Your listing goes live immediately.</p>
+        <div className="toggle-type">
+          <button className={`toggle-btn ${mode==='business'?'active':''}`} onClick={()=>setMode('business')}>
+            <i className="bi bi-shop me-2"></i>Business / Professional Practice
+          </button>
+          <button className={`toggle-btn ${mode==='job'?'active':''}`} onClick={()=>setMode('job')}>
+            <i className="bi bi-briefcase me-2"></i>Working Professional / Job
+          </button>
+        </div>
+        {mode==='business'
+          ? <RegisterBizForm onSuccess={onSuccess}/>
+          : <RegisterJobForm onSuccess={onSuccess}/>
+        }
+      </div>
+    </div>
+  );
+}
 
-  const set = (f, v) => {
-    setForm(p => ({...p, [f]: v}));
-    setErrors(p => ({...p, [f]: ''}));
-  };
+// ---- Business Registration Form ----
+function RegisterBizForm({ onSuccess }) {
+  const E = {owner_name:'',business_name:'',contact:'',business_type:'',other_type:'',address:'',city:'',state:'',edit_pin:'',confirm_pin:''};
+  const [form,setForm] = useState({...E});
+  const [errors,setErrors] = useState({});
+  const [busy,setBusy] = useState(false);
+  const [showPin,setShowPin] = useState(false);
 
-  const validate = () => {
-    const e = {};
-    if (!form.owner_name.trim())    e.owner_name    = 'Owner name is required';
-    if (!form.business_name.trim()) e.business_name = 'Business name is required';
-    if (!form.contact.trim())       e.contact       = 'Contact number is required';
-    else if (!/^\+?[\d\s\-()]{7,16}$/.test(form.contact.trim())) e.contact = 'Enter a valid phone number';
-    if (!form.business_type)        e.business_type = 'Please select a business type';
-    if (!form.city.trim())          e.city          = 'City is required';
-    if (!form.state.trim())         e.state         = 'State is required';
-    if (!form.country.trim())       e.country       = 'Country is required';
-    if (!form.edit_pin.trim())      e.edit_pin      = 'PIN is required';
-    else if (form.edit_pin.length < 4) e.edit_pin   = 'PIN must be at least 4 characters';
-    if (form.edit_pin !== form.confirm_pin) e.confirm_pin = 'PINs do not match';
+  const set=(f,v)=>{setForm(p=>({...p,[f]:v}));setErrors(p=>({...p,[f]:''}));};
+  const isOther = form.business_type==='Other';
+
+  const validate=()=>{
+    const e={};
+    if (!form.owner_name.trim())    e.owner_name='Required';
+    if (!form.business_name.trim()) e.business_name='Required';
+    if (!form.contact.trim())       e.contact='Required';
+    else if(!/^\+?[\d\s\-()]{7,16}$/.test(form.contact.trim())) e.contact='Invalid number';
+    if (!form.business_type)        e.business_type='Required';
+    if (isOther&&!form.other_type.trim()) e.other_type='Please specify your business type';
+    if (!form.city.trim())          e.city='Required';
+    if (!form.state.trim())         e.state='Required';
+    if (!form.edit_pin.trim())      e.edit_pin='Required';
+    else if(form.edit_pin.length<4) e.edit_pin='Min 4 characters';
+    if (form.edit_pin!==form.confirm_pin) e.confirm_pin='PINs do not match';
     return e;
   };
 
-  const handleSubmit = async e => {
+  const handleSubmit=async e=>{
     e.preventDefault();
-    const errs = validate();
-    if (Object.keys(errs).length) { setErrors(errs); return; }
+    const errs=validate();
+    if(Object.keys(errs).length){setErrors(errs);return;}
     setBusy(true);
-
-    // Duplicate contact check
-    const { data: dup } = await sb.from('businesses').select('id').eq('contact', form.contact.trim()).maybeSingle();
-    if (dup) {
-      setErrors({ contact: 'This contact number is already registered' });
-      setBusy(false);
-      return;
-    }
-
-    const { error } = await sb.from('businesses').insert([{
-      owner_name:    form.owner_name.trim(),
-      business_name: form.business_name.trim(),
-      contact:       form.contact.trim(),
-      business_type: form.business_type,
-      address:       form.address.trim(),
-      city:          form.city.trim(),
-      state:         form.state.trim(),
-      country:       form.country.trim(),
-      edit_pin:      form.edit_pin,
+    const {data:dup}=await sb.from('businesses').select('id').eq('contact',form.contact.trim()).maybeSingle();
+    if(dup){setErrors({contact:'This contact is already registered'});setBusy(false);return;}
+    const finalType = isOther ? form.other_type.trim() : form.business_type;
+    const {error}=await sb.from('businesses').insert([{
+      listing_type:'business',
+      owner_name:form.owner_name.trim(), business_name:form.business_name.trim(),
+      contact:form.contact.trim(), business_type:finalType,
+      address:form.address.trim(), city:form.city.trim(),
+      state:form.state, country:'India', edit_pin:form.edit_pin,
     }]);
-
     setBusy(false);
-    if (error) {
-      showToast('Registration failed: ' + error.message, 'error');
-    } else {
-      showToast('Business registered successfully! You are now live in the directory.', 'success');
-      setForm({...EMPTY_FORM});
-      onSuccess();
-    }
+    if(error) showToast('Registration failed: '+error.message,'error');
+    else{showToast('Business registered! You are now live.','success');setForm({...E});onSuccess();}
+  };
+
+  return (
+    <form onSubmit={handleSubmit} noValidate>
+      <div className="form-section-title"><i className="bi bi-shop me-1"></i>Business Information</div>
+      <div className="row g-3">
+        <div className="col-md-6">
+          <label className="form-label">Owner / Contact Person Name <span className="text-danger">*</span></label>
+          <input className={`form-control ${errors.owner_name?'is-invalid':''}`} placeholder="Your full name"
+            value={form.owner_name} onChange={e=>set('owner_name',e.target.value)}/>
+          {errors.owner_name&&<div className="invalid-feedback">{errors.owner_name}</div>}
+        </div>
+        <div className="col-md-6">
+          <label className="form-label">Business Name <span className="text-danger">*</span></label>
+          <input className={`form-control ${errors.business_name?'is-invalid':''}`} placeholder="Shop / company name"
+            value={form.business_name} onChange={e=>set('business_name',e.target.value)}/>
+          {errors.business_name&&<div className="invalid-feedback">{errors.business_name}</div>}
+        </div>
+        <div className="col-md-6">
+          <label className="form-label">Contact Number <span className="text-danger">*</span></label>
+          <input type="tel" className={`form-control ${errors.contact?'is-invalid':''}`} placeholder="+91 98765 43210"
+            value={form.contact} onChange={e=>set('contact',e.target.value)}/>
+          {errors.contact&&<div className="invalid-feedback">{errors.contact}</div>}
+        </div>
+        <div className="col-md-6">
+          <label className="form-label">Business Type <span className="text-danger">*</span></label>
+          <select className={`form-select ${errors.business_type?'is-invalid':''}`}
+            value={form.business_type} onChange={e=>set('business_type',e.target.value)}>
+            <option value="">Select type...</option>
+            {BIZ_TYPES.map(t=><option key={t} value={t}>{t}</option>)}
+          </select>
+          {errors.business_type&&<div className="invalid-feedback">{errors.business_type}</div>}
+        </div>
+        {isOther&&(
+          <div className="col-12">
+            <label className="form-label">Specify Your Business Type <span className="text-danger">*</span></label>
+            <input className={`form-control ${errors.other_type?'is-invalid':''}`}
+              placeholder="e.g. Bakery, Nursery, Astrologer..."
+              value={form.other_type} onChange={e=>set('other_type',e.target.value)}/>
+            {errors.other_type&&<div className="invalid-feedback">{errors.other_type}</div>}
+          </div>
+        )}
+      </div>
+
+      <div className="form-section-title"><i className="bi bi-geo-alt me-1"></i>Location</div>
+      <div className="mb-3">
+        <label className="form-label">Address (Shop / Street / Area)</label>
+        <input className="form-control" placeholder="Shop no., street, locality"
+          value={form.address} onChange={e=>set('address',e.target.value)}/>
+      </div>
+      <LocationSelector
+        state={form.state} city={form.city}
+        onStateChange={v=>set('state',v)} onCityChange={v=>set('city',v)}
+        errors={errors}/>
+
+      <div className="form-section-title"><i className="bi bi-shield-lock me-1"></i>Security PIN</div>
+      <div className="alert alert-info py-2 small mb-3">
+        <i className="bi bi-info-circle me-1"></i>Use this PIN to edit or delete your listing later from <strong>My Listing</strong>.
+      </div>
+      <div className="row g-3">
+        <div className="col-md-6">
+          <label className="form-label">Set PIN <span className="text-danger">*</span></label>
+          <div className="input-group">
+            <input type={showPin?'text':'password'} className={`form-control ${errors.edit_pin?'is-invalid':''}`}
+              placeholder="Min 4 characters" value={form.edit_pin} onChange={e=>set('edit_pin',e.target.value)}/>
+            <button type="button" className="btn btn-outline-secondary" onClick={()=>setShowPin(p=>!p)}>
+              <i className={`bi bi-eye${showPin?'-slash':''}`}></i>
+            </button>
+            {errors.edit_pin&&<div className="invalid-feedback">{errors.edit_pin}</div>}
+          </div>
+        </div>
+        <div className="col-md-6">
+          <label className="form-label">Confirm PIN <span className="text-danger">*</span></label>
+          <input type={showPin?'text':'password'} className={`form-control ${errors.confirm_pin?'is-invalid':''}`}
+            placeholder="Repeat PIN" value={form.confirm_pin} onChange={e=>set('confirm_pin',e.target.value)}/>
+          {errors.confirm_pin&&<div className="invalid-feedback">{errors.confirm_pin}</div>}
+        </div>
+      </div>
+      <button type="submit" className="btn btn-brand w-100 mt-4 py-2 fs-6" disabled={busy}>
+        {busy?<><span className="spinner-border spinner-border-sm me-2"></span>Registering...</>
+             :<><i className="bi bi-check-circle me-2"></i>Register &amp; Go Live Now</>}
+      </button>
+    </form>
+  );
+}
+
+// ---- Job / Working Professional Registration Form ----
+function RegisterJobForm({ onSuccess }) {
+  const E={owner_name:'',designation:'',business_type:'',other_type:'',business_name:'',contact:'',city:'',state:'',edit_pin:'',confirm_pin:''};
+  const [form,setForm]=useState({...E});
+  const [errors,setErrors]=useState({});
+  const [busy,setBusy]=useState(false);
+  const [showPin,setShowPin]=useState(false);
+
+  const set=(f,v)=>{setForm(p=>({...p,[f]:v}));setErrors(p=>({...p,[f]:''}));};
+  const isOther=form.business_type==='Other';
+
+  const validate=()=>{
+    const e={};
+    if(!form.owner_name.trim())    e.owner_name='Required';
+    if(!form.designation.trim())   e.designation='Required';
+    if(!form.business_type)        e.business_type='Required';
+    if(isOther&&!form.other_type.trim()) e.other_type='Please specify your field';
+    if(!form.contact.trim())       e.contact='Required';
+    else if(!/^\+?[\d\s\-()]{7,16}$/.test(form.contact.trim())) e.contact='Invalid number';
+    if(!form.city.trim())          e.city='Required';
+    if(!form.state.trim())         e.state='Required';
+    if(!form.edit_pin.trim())      e.edit_pin='Required';
+    else if(form.edit_pin.length<4) e.edit_pin='Min 4 characters';
+    if(form.edit_pin!==form.confirm_pin) e.confirm_pin='PINs do not match';
+    return e;
+  };
+
+  const handleSubmit=async e=>{
+    e.preventDefault();
+    const errs=validate();
+    if(Object.keys(errs).length){setErrors(errs);return;}
+    setBusy(true);
+    const {data:dup}=await sb.from('businesses').select('id').eq('contact',form.contact.trim()).maybeSingle();
+    if(dup){setErrors({contact:'This contact is already registered'});setBusy(false);return;}
+    const finalField=isOther?form.other_type.trim():form.business_type;
+    const {error}=await sb.from('businesses').insert([{
+      listing_type:'job',
+      owner_name:form.owner_name.trim(), designation:form.designation.trim(),
+      business_type:finalField, business_name:form.business_name.trim(),
+      contact:form.contact.trim(), address:'',
+      city:form.city.trim(), state:form.state, country:'India',
+      edit_pin:form.edit_pin,
+    }]);
+    setBusy(false);
+    if(error) showToast('Registration failed: '+error.message,'error');
+    else{showToast('Profile registered! You are now live.','success');setForm({...E});onSuccess();}
+  };
+
+  return (
+    <form onSubmit={handleSubmit} noValidate>
+      <div className="form-section-title"><i className="bi bi-person-badge me-1"></i>Professional Information</div>
+      <div className="row g-3">
+        <div className="col-md-6">
+          <label className="form-label">Full Name <span className="text-danger">*</span></label>
+          <input className={`form-control ${errors.owner_name?'is-invalid':''}`} placeholder="Your full name"
+            value={form.owner_name} onChange={e=>set('owner_name',e.target.value)}/>
+          {errors.owner_name&&<div className="invalid-feedback">{errors.owner_name}</div>}
+        </div>
+        <div className="col-md-6">
+          <label className="form-label">Designation / Job Title <span className="text-danger">*</span></label>
+          <input className={`form-control ${errors.designation?'is-invalid':''}`} placeholder="e.g. Software Engineer, Manager, Doctor"
+            value={form.designation} onChange={e=>set('designation',e.target.value)}/>
+          {errors.designation&&<div className="invalid-feedback">{errors.designation}</div>}
+        </div>
+        <div className="col-md-6">
+          <label className="form-label">Profession / Field <span className="text-danger">*</span></label>
+          <select className={`form-select ${errors.business_type?'is-invalid':''}`}
+            value={form.business_type} onChange={e=>set('business_type',e.target.value)}>
+            <option value="">Select field...</option>
+            {JOB_FIELDS.map(f=><option key={f} value={f}>{f}</option>)}
+          </select>
+          {errors.business_type&&<div className="invalid-feedback">{errors.business_type}</div>}
+        </div>
+        {isOther&&(
+          <div className="col-md-6">
+            <label className="form-label">Specify Your Field <span className="text-danger">*</span></label>
+            <input className={`form-control ${errors.other_type?'is-invalid':''}`}
+              placeholder="Your profession / field"
+              value={form.other_type} onChange={e=>set('other_type',e.target.value)}/>
+            {errors.other_type&&<div className="invalid-feedback">{errors.other_type}</div>}
+          </div>
+        )}
+        <div className="col-md-6">
+          <label className="form-label">Company / Organization / Hospital</label>
+          <input className="form-control" placeholder="Where you work (optional)"
+            value={form.business_name} onChange={e=>set('business_name',e.target.value)}/>
+        </div>
+        <div className="col-md-6">
+          <label className="form-label">Contact Number <span className="text-danger">*</span></label>
+          <input type="tel" className={`form-control ${errors.contact?'is-invalid':''}`} placeholder="+91 98765 43210"
+            value={form.contact} onChange={e=>set('contact',e.target.value)}/>
+          {errors.contact&&<div className="invalid-feedback">{errors.contact}</div>}
+        </div>
+      </div>
+
+      <div className="form-section-title"><i className="bi bi-geo-alt me-1"></i>Location</div>
+      <LocationSelector
+        state={form.state} city={form.city}
+        onStateChange={v=>set('state',v)} onCityChange={v=>set('city',v)}
+        errors={errors}/>
+
+      <div className="form-section-title"><i className="bi bi-shield-lock me-1"></i>Security PIN</div>
+      <div className="alert alert-info py-2 small mb-3">
+        <i className="bi bi-info-circle me-1"></i>Use this PIN to edit or delete your listing from <strong>My Listing</strong>.
+      </div>
+      <div className="row g-3">
+        <div className="col-md-6">
+          <label className="form-label">Set PIN <span className="text-danger">*</span></label>
+          <div className="input-group">
+            <input type={showPin?'text':'password'} className={`form-control ${errors.edit_pin?'is-invalid':''}`}
+              placeholder="Min 4 characters" value={form.edit_pin} onChange={e=>set('edit_pin',e.target.value)}/>
+            <button type="button" className="btn btn-outline-secondary" onClick={()=>setShowPin(p=>!p)}>
+              <i className={`bi bi-eye${showPin?'-slash':''}`}></i>
+            </button>
+            {errors.edit_pin&&<div className="invalid-feedback">{errors.edit_pin}</div>}
+          </div>
+        </div>
+        <div className="col-md-6">
+          <label className="form-label">Confirm PIN <span className="text-danger">*</span></label>
+          <input type={showPin?'text':'password'} className={`form-control ${errors.confirm_pin?'is-invalid':''}`}
+            placeholder="Repeat PIN" value={form.confirm_pin} onChange={e=>set('confirm_pin',e.target.value)}/>
+          {errors.confirm_pin&&<div className="invalid-feedback">{errors.confirm_pin}</div>}
+        </div>
+      </div>
+      <button type="submit" className="btn w-100 mt-4 py-2 fs-6" style={{background:'#059669',color:'white',fontWeight:700,borderRadius:'8px'}} disabled={busy}>
+        {busy?<><span className="spinner-border spinner-border-sm me-2"></span>Registering...</>
+             :<><i className="bi bi-check-circle me-2"></i>Register &amp; Go Live Now</>}
+      </button>
+    </form>
+  );
+}
+
+// ================================================================
+//  MY LISTING TAB
+// ================================================================
+function MyListingTab({ onRefresh }) {
+  const [step,setStep]=useState('verify');
+  const [contact,setContact]=useState('');
+  const [pin,setPin]=useState('');
+  const [myRec,setMyRec]=useState(null);
+  const [err,setErr]=useState('');
+  const [busy,setBusy]=useState(false);
+  const [showPin,setShowPin]=useState(false);
+
+  const verify=async e=>{
+    e.preventDefault();setErr('');setBusy(true);
+    const {data}=await sb.from('businesses').select('*')
+      .eq('contact',contact.trim()).eq('edit_pin',pin.trim()).maybeSingle();
+    setBusy(false);
+    if(data){setMyRec(data);setStep('edit');}
+    else setErr('Contact number or PIN is incorrect.');
+  };
+
+  const goBack=()=>{setStep('verify');setMyRec(null);setContact('');setPin('');setErr('');};
+
+  if(step==='verify') return (
+    <div style={{maxWidth:'480px',margin:'0 auto'}}>
+      <div className="card-clean p-4">
+        <h5 className="fw-bold mb-0"><i className="bi bi-pencil-square me-2 text-primary"></i>My Listing</h5>
+        <p className="text-muted small mt-1 mb-4">Enter your registered contact and PIN to edit or remove your listing.</p>
+        <form onSubmit={verify}>
+          <div className="mb-3">
+            <label className="form-label">Registered Contact Number <span className="text-danger">*</span></label>
+            <input type="tel" className="form-control" placeholder="+91 98765 43210"
+              value={contact} onChange={e=>setContact(e.target.value)} required/>
+          </div>
+          <div className="mb-3">
+            <label className="form-label">Your PIN <span className="text-danger">*</span></label>
+            <div className="input-group">
+              <input type={showPin?'text':'password'} className="form-control" placeholder="Enter PIN"
+                value={pin} onChange={e=>setPin(e.target.value)} required/>
+              <button type="button" className="btn btn-outline-secondary" onClick={()=>setShowPin(p=>!p)}>
+                <i className={`bi bi-eye${showPin?'-slash':''}`}></i>
+              </button>
+            </div>
+          </div>
+          {err&&<div className="alert alert-danger py-2 small"><i className="bi bi-exclamation-circle me-1"></i>{err}</div>}
+          <button type="submit" className="btn btn-brand w-100 py-2" disabled={busy}>
+            {busy?<span className="spinner-border spinner-border-sm"></span>
+                 :<><i className="bi bi-unlock me-2"></i>Access My Listing</>}
+          </button>
+        </form>
+      </div>
+    </div>
+  );
+
+  return <EditForm biz={myRec} onRefresh={onRefresh} onDone={goBack}/>;
+}
+
+// ================================================================
+//  EDIT FORM (Business + Job)
+// ================================================================
+function EditForm({ biz, onRefresh, onDone }) {
+  const isJob = biz.listing_type==='job';
+  const [form,setForm]=useState({...biz});
+  const [busy,setBusy]=useState(false);
+  const [delBusy,setDelBusy]=useState(false);
+  const [errors,setErrors]=useState({});
+
+  const set=(f,v)=>{setForm(p=>({...p,[f]:v}));setErrors(p=>({...p,[f]:''}));};
+
+  const validate=()=>{
+    const e={};
+    if(!form.owner_name?.trim()) e.owner_name='Required';
+    if(!form.contact?.trim())    e.contact='Required';
+    if(!form.business_type)      e.business_type='Required';
+    if(!form.city?.trim())       e.city='Required';
+    if(!form.state?.trim())      e.state='Required';
+    if(!isJob&&!form.business_name?.trim()) e.business_name='Required';
+    if(isJob&&!form.designation?.trim())   e.designation='Required';
+    return e;
+  };
+
+  const save=async e=>{
+    e.preventDefault();
+    const errs=validate();
+    if(Object.keys(errs).length){setErrors(errs);return;}
+    setBusy(true);
+    const {error}=await sb.from('businesses').update({
+      owner_name:form.owner_name.trim(),
+      business_name:form.business_name?.trim()||'',
+      contact:form.contact.trim(),
+      business_type:form.business_type,
+      designation:form.designation?.trim()||'',
+      address:form.address?.trim()||'',
+      city:form.city.trim(), state:form.state,
+      updated_at:new Date().toISOString(),
+    }).eq('id',form.id);
+    setBusy(false);
+    if(error) showToast('Update failed: '+error.message,'error');
+    else{showToast('Updated successfully!','success');onRefresh();onDone();}
+  };
+
+  const del=async()=>{
+    if(!window.confirm('Delete this listing permanently?')) return;
+    setDelBusy(true);
+    const {error}=await sb.from('businesses').delete().eq('id',form.id);
+    setDelBusy(false);
+    if(error) showToast('Delete failed','error');
+    else{showToast('Listing deleted.','info');onRefresh();onDone();}
   };
 
   return (
     <div className="form-wrap">
       <div className="card-clean p-4">
-        <h5 className="fw-bold mb-0"><i className="bi bi-plus-circle-fill me-2 text-primary"></i>Register Your Business</h5>
-        <p className="text-muted small mt-1 mb-0">Fill in your details — your listing goes live immediately.</p>
-
-        <form onSubmit={handleSubmit} noValidate>
-
-          {/* Section: Business Info */}
-          <div className="form-section-title"><i className="bi bi-shop me-1"></i>Business Information</div>
+        <div className="d-flex justify-content-between align-items-center mb-3">
+          <h5 className="fw-bold mb-0"><i className="bi bi-pencil-fill me-2 text-primary"></i>Edit {isJob?'Professional Profile':'Business'}</h5>
+          <button className="btn btn-sm btn-outline-secondary" onClick={onDone}><i className="bi bi-arrow-left me-1"></i>Back</button>
+        </div>
+        <form onSubmit={save} noValidate>
           <div className="row g-3">
             <div className="col-md-6">
-              <label className="form-label">Owner / Contact Person Name <span className="text-danger">*</span></label>
-              <input type="text" className={`form-control ${errors.owner_name ? 'is-invalid' : ''}`}
-                placeholder="Your full name"
-                value={form.owner_name} onChange={e => set('owner_name', e.target.value)} />
-              {errors.owner_name && <div className="invalid-feedback">{errors.owner_name}</div>}
+              <label className="form-label">{isJob?'Full Name':'Owner Name'} <span className="text-danger">*</span></label>
+              <input className={`form-control ${errors.owner_name?'is-invalid':''}`}
+                value={form.owner_name||''} onChange={e=>set('owner_name',e.target.value)}/>
+              {errors.owner_name&&<div className="invalid-feedback">{errors.owner_name}</div>}
             </div>
-            <div className="col-md-6">
-              <label className="form-label">Business Name <span className="text-danger">*</span></label>
-              <input type="text" className={`form-control ${errors.business_name ? 'is-invalid' : ''}`}
-                placeholder="Your shop / company name"
-                value={form.business_name} onChange={e => set('business_name', e.target.value)} />
-              {errors.business_name && <div className="invalid-feedback">{errors.business_name}</div>}
-            </div>
-            <div className="col-md-6">
-              <label className="form-label">Contact Number <span className="text-danger">*</span></label>
-              <input type="tel" className={`form-control ${errors.contact ? 'is-invalid' : ''}`}
-                placeholder="+91 98765 43210"
-                value={form.contact} onChange={e => set('contact', e.target.value)} />
-              {errors.contact && <div className="invalid-feedback">{errors.contact}</div>}
-            </div>
-            <div className="col-md-6">
-              <label className="form-label">Business Type <span className="text-danger">*</span></label>
-              <select className={`form-select ${errors.business_type ? 'is-invalid' : ''}`}
-                value={form.business_type} onChange={e => set('business_type', e.target.value)}>
-                <option value="">Select business type...</option>
-                {BIZ_TYPES.map(t => <option key={t} value={t}>{t}</option>)}
-              </select>
-              {errors.business_type && <div className="invalid-feedback">{errors.business_type}</div>}
-            </div>
-          </div>
-
-          {/* Section: Location */}
-          <div className="form-section-title"><i className="bi bi-geo-alt me-1"></i>Location</div>
-          <div className="row g-3">
-            <div className="col-12">
-              <label className="form-label">Address (Shop / Street / Area)</label>
-              <input type="text" className="form-control"
-                placeholder="Shop no., street, locality, area"
-                value={form.address} onChange={e => set('address', e.target.value)} />
-            </div>
-            <div className="col-md-4">
-              <label className="form-label">City <span className="text-danger">*</span></label>
-              <input type="text" className={`form-control ${errors.city ? 'is-invalid' : ''}`}
-                placeholder="City"
-                value={form.city} onChange={e => set('city', e.target.value)} />
-              {errors.city && <div className="invalid-feedback">{errors.city}</div>}
-            </div>
-            <div className="col-md-4">
-              <label className="form-label">State <span className="text-danger">*</span></label>
-              <input type="text" className={`form-control ${errors.state ? 'is-invalid' : ''}`}
-                placeholder="State"
-                value={form.state} onChange={e => set('state', e.target.value)} />
-              {errors.state && <div className="invalid-feedback">{errors.state}</div>}
-            </div>
-            <div className="col-md-4">
-              <label className="form-label">Country <span className="text-danger">*</span></label>
-              <input type="text" className={`form-control ${errors.country ? 'is-invalid' : ''}`}
-                placeholder="Country"
-                value={form.country} onChange={e => set('country', e.target.value)} />
-              {errors.country && <div className="invalid-feedback">{errors.country}</div>}
-            </div>
-          </div>
-
-          {/* Section: Security PIN */}
-          <div className="form-section-title"><i className="bi bi-shield-lock me-1"></i>Security PIN</div>
-          <div className="alert alert-info py-2 small mb-3">
-            <i className="bi bi-info-circle me-1"></i>
-            This PIN lets you edit or delete your listing later from the <strong>My Business</strong> tab. Keep it safe.
-          </div>
-          <div className="row g-3">
-            <div className="col-md-6">
-              <label className="form-label">Set PIN <span className="text-danger">*</span></label>
-              <div className="input-group">
-                <input type={showPin ? 'text' : 'password'}
-                  className={`form-control ${errors.edit_pin ? 'is-invalid' : ''}`}
-                  placeholder="Min 4 characters"
-                  value={form.edit_pin} onChange={e => set('edit_pin', e.target.value)} />
-                <button type="button" className="btn btn-outline-secondary"
-                  onClick={() => setShowPin(p => !p)}>
-                  <i className={`bi bi-eye${showPin ? '-slash' : ''}`}></i>
-                </button>
-                {errors.edit_pin && <div className="invalid-feedback">{errors.edit_pin}</div>}
+            {isJob?(
+              <div className="col-md-6">
+                <label className="form-label">Designation <span className="text-danger">*</span></label>
+                <input className={`form-control ${errors.designation?'is-invalid':''}`}
+                  value={form.designation||''} onChange={e=>set('designation',e.target.value)}/>
+                {errors.designation&&<div className="invalid-feedback">{errors.designation}</div>}
               </div>
+            ):(
+              <div className="col-md-6">
+                <label className="form-label">Business Name <span className="text-danger">*</span></label>
+                <input className={`form-control ${errors.business_name?'is-invalid':''}`}
+                  value={form.business_name||''} onChange={e=>set('business_name',e.target.value)}/>
+                {errors.business_name&&<div className="invalid-feedback">{errors.business_name}</div>}
+              </div>
+            )}
+            <div className="col-md-6">
+              <label className="form-label">Contact <span className="text-danger">*</span></label>
+              <input className={`form-control ${errors.contact?'is-invalid':''}`}
+                value={form.contact||''} onChange={e=>set('contact',e.target.value)}/>
+              {errors.contact&&<div className="invalid-feedback">{errors.contact}</div>}
             </div>
             <div className="col-md-6">
-              <label className="form-label">Confirm PIN <span className="text-danger">*</span></label>
-              <input type={showPin ? 'text' : 'password'}
-                className={`form-control ${errors.confirm_pin ? 'is-invalid' : ''}`}
-                placeholder="Repeat your PIN"
-                value={form.confirm_pin} onChange={e => set('confirm_pin', e.target.value)} />
-              {errors.confirm_pin && <div className="invalid-feedback">{errors.confirm_pin}</div>}
+              <label className="form-label">{isJob?'Profession / Field':'Business Type'} <span className="text-danger">*</span></label>
+              <select className={`form-select ${errors.business_type?'is-invalid':''}`}
+                value={form.business_type||''} onChange={e=>set('business_type',e.target.value)}>
+                <option value="">Select...</option>
+                {(isJob?JOB_FIELDS:BIZ_TYPES).map(t=><option key={t} value={t}>{t}</option>)}
+              </select>
+              {errors.business_type&&<div className="invalid-feedback">{errors.business_type}</div>}
             </div>
+            {isJob&&(
+              <div className="col-md-6">
+                <label className="form-label">Company / Organization</label>
+                <input className="form-control" value={form.business_name||''} onChange={e=>set('business_name',e.target.value)}/>
+              </div>
+            )}
+            {!isJob&&(
+              <div className="col-12">
+                <label className="form-label">Address</label>
+                <input className="form-control" value={form.address||''} onChange={e=>set('address',e.target.value)}/>
+              </div>
+            )}
           </div>
-
-          <button type="submit" className="btn btn-brand w-100 mt-4 py-2 fs-6" disabled={busy}>
-            {busy
-              ? <><span className="spinner-border spinner-border-sm me-2"></span>Registering...</>
-              : <><i className="bi bi-check-circle me-2"></i>Register &amp; Go Live Now</>
-            }
-          </button>
+          <div className="mt-3">
+            <LocationSelector
+              state={form.state||''} city={form.city||''}
+              onStateChange={v=>set('state',v)} onCityChange={v=>set('city',v)}
+              errors={errors}/>
+          </div>
+          <div className="d-flex gap-2 mt-4">
+            <button type="submit" className="btn btn-brand flex-grow-1 py-2" disabled={busy}>
+              {busy?<span className="spinner-border spinner-border-sm"></span>:<><i className="bi bi-save me-1"></i>Save Changes</>}
+            </button>
+            <button type="button" className="btn btn-danger px-4 py-2" onClick={del} disabled={delBusy}>
+              {delBusy?<span className="spinner-border spinner-border-sm"></span>:<><i className="bi bi-trash me-1"></i>Delete</>}
+            </button>
+          </div>
         </form>
       </div>
     </div>
@@ -686,219 +1047,104 @@ function RegisterTab({ onSuccess }) {
 }
 
 // ================================================================
-//  MY BUSINESS TAB
+//  NEAR ME TAB
 // ================================================================
-function MyBusinessTab({ businesses, onRefresh }) {
-  const [step, setStep]         = useState('verify');
-  const [contact, setContact]   = useState('');
-  const [pin, setPin]           = useState('');
-  const [myBiz, setMyBiz]       = useState(null);
-  const [err, setErr]           = useState('');
-  const [busy, setBusy]         = useState(false);
-  const [showPin, setShowPin]   = useState(false);
+function NearMeTab({ listings }) {
+  const [status,setStatus]=useState('idle'); // idle | loading | done | error | denied
+  const [userCity,setUserCity]=useState('');
+  const [userState,setUserState]=useState('');
+  const [results,setResults]=useState([]);
 
-  const handleVerify = async e => {
-    e.preventDefault();
-    setErr('');
-    setBusy(true);
-    const { data } = await sb.from('businesses')
-      .select('*')
-      .eq('contact', contact.trim())
-      .eq('edit_pin', pin.trim())
-      .maybeSingle();
-    setBusy(false);
-    if (data) {
-      setMyBiz(data);
-      setStep('edit');
-    } else {
-      setErr('Contact number or PIN is incorrect. Please check and try again.');
-    }
-  };
-
-  const goBack = () => {
-    setStep('verify'); setMyBiz(null); setContact(''); setPin(''); setErr('');
-  };
-
-  if (step === 'verify') {
-    return (
-      <div className="form-wrap">
-        <div className="card-clean p-4" style={{maxWidth:'480px',margin:'0 auto'}}>
-          <h5 className="fw-bold mb-0"><i className="bi bi-pencil-square me-2 text-primary"></i>My Business</h5>
-          <p className="text-muted small mt-1 mb-4">Enter your registered contact and PIN to edit or remove your listing.</p>
-          <form onSubmit={handleVerify}>
-            <div className="mb-3">
-              <label className="form-label">Registered Contact Number <span className="text-danger">*</span></label>
-              <input type="tel" className="form-control" placeholder="+91 98765 43210"
-                value={contact} onChange={e => setContact(e.target.value)} required />
-            </div>
-            <div className="mb-3">
-              <label className="form-label">Your PIN <span className="text-danger">*</span></label>
-              <div className="input-group">
-                <input type={showPin ? 'text' : 'password'} className="form-control" placeholder="Enter PIN"
-                  value={pin} onChange={e => setPin(e.target.value)} required />
-                <button type="button" className="btn btn-outline-secondary" onClick={() => setShowPin(p => !p)}>
-                  <i className={`bi bi-eye${showPin ? '-slash' : ''}`}></i>
-                </button>
-              </div>
-            </div>
-            {err && <div className="alert alert-danger py-2 small"><i className="bi bi-exclamation-circle me-1"></i>{err}</div>}
-            <button type="submit" className="btn btn-brand w-100 py-2" disabled={busy}>
-              {busy
-                ? <span className="spinner-border spinner-border-sm"></span>
-                : <><i className="bi bi-unlock me-2"></i>Access My Listing</>}
-            </button>
-          </form>
-        </div>
-      </div>
-    );
-  }
-
-  return (
-    <EditForm
-      biz={myBiz}
-      onRefresh={onRefresh}
-      onDone={goBack}
-    />
-  );
-}
-
-// ================================================================
-//  EDIT FORM (used by MyBusiness + Admin)
-// ================================================================
-function EditForm({ biz, onRefresh, onDone }) {
-  const [form, setForm] = useState({...biz});
-  const [busy, setBusy] = useState(false);
-  const [delBusy, setDelBusy] = useState(false);
-  const [errors, setErrors] = useState({});
-
-  const set = (f, v) => { setForm(p => ({...p, [f]: v})); setErrors(p => ({...p, [f]: ''})); };
-
-  const validate = () => {
-    const e = {};
-    if (!form.owner_name?.trim())    e.owner_name    = 'Required';
-    if (!form.business_name?.trim()) e.business_name = 'Required';
-    if (!form.contact?.trim())       e.contact       = 'Required';
-    if (!form.business_type)         e.business_type = 'Required';
-    if (!form.city?.trim())          e.city          = 'Required';
-    if (!form.state?.trim())         e.state         = 'Required';
-    if (!form.country?.trim())       e.country       = 'Required';
-    return e;
-  };
-
-  const handleSave = async e => {
-    e.preventDefault();
-    const errs = validate();
-    if (Object.keys(errs).length) { setErrors(errs); return; }
-    setBusy(true);
-    const { error } = await sb.from('businesses').update({
-      owner_name:    form.owner_name.trim(),
-      business_name: form.business_name.trim(),
-      contact:       form.contact.trim(),
-      business_type: form.business_type,
-      address:       form.address?.trim() || '',
-      city:          form.city.trim(),
-      state:         form.state.trim(),
-      country:       form.country.trim(),
-      updated_at:    new Date().toISOString(),
-    }).eq('id', form.id);
-    setBusy(false);
-    if (error) showToast('Update failed: ' + error.message, 'error');
-    else { showToast('Business updated successfully!', 'success'); onRefresh(); onDone(); }
-  };
-
-  const handleDelete = async () => {
-    if (!window.confirm('Delete this listing permanently? This cannot be undone.')) return;
-    setDelBusy(true);
-    const { error } = await sb.from('businesses').delete().eq('id', form.id);
-    setDelBusy(false);
-    if (error) showToast('Delete failed: ' + error.message, 'error');
-    else { showToast('Listing deleted.', 'info'); onRefresh(); onDone(); }
+  const findMe=async()=>{
+    if(!navigator.geolocation){setStatus('error');return;}
+    setStatus('loading');
+    navigator.geolocation.getCurrentPosition(async pos=>{
+      try{
+        const {latitude:lat,longitude:lon}=pos.coords;
+        const res=await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json&addressdetails=1`);
+        const data=await res.json();
+        const addr=data.address||{};
+        const city=(addr.city||addr.town||addr.village||addr.county||'').trim();
+        const state=(addr.state||'').trim();
+        setUserCity(city);
+        setUserState(state);
+        // Filter listings within same city or state
+        const nearby=listings.filter(b=>{
+          const bCity=(b.city||'').toLowerCase();
+          const bState=(b.state||'').toLowerCase();
+          if(city&&bCity===city.toLowerCase()) return true;
+          if(state&&bState===state.toLowerCase()) return true;
+          return false;
+        });
+        setResults(nearby);
+        setStatus('done');
+      }catch(e){setStatus('error');}
+    },()=>setStatus('denied'),{timeout:10000});
   };
 
   return (
-    <div className="form-wrap">
-      <div className="card-clean p-4">
-        <div className="d-flex justify-content-between align-items-center mb-3">
-          <h5 className="fw-bold mb-0">
-            <i className="bi bi-pencil-fill me-2 text-primary"></i>Edit Business
-          </h5>
-          <button className="btn btn-sm btn-outline-secondary" onClick={onDone}>
-            <i className="bi bi-arrow-left me-1"></i>Back
+    <div>
+      <div className="near-me-card mb-4">
+        <div style={{fontSize:'3rem',marginBottom:'.75rem'}}>📍</div>
+        <h5 className="fw-bold">Find Listings Near You</h5>
+        <p className="text-muted small mb-3">We'll detect your location and show businesses &amp; professionals in your area.</p>
+        {status==='idle'&&(
+          <button className="btn btn-brand px-4 py-2" onClick={findMe}>
+            <i className="bi bi-geo-alt-fill me-2"></i>Detect My Location
           </button>
-        </div>
-
-        <form onSubmit={handleSave} noValidate>
-          <div className="form-section-title"><i className="bi bi-shop me-1"></i>Business Information</div>
-          <div className="row g-3">
-            <div className="col-md-6">
-              <label className="form-label">Owner Name <span className="text-danger">*</span></label>
-              <input className={`form-control ${errors.owner_name ? 'is-invalid' : ''}`}
-                value={form.owner_name || ''} onChange={e => set('owner_name', e.target.value)} />
-              {errors.owner_name && <div className="invalid-feedback">{errors.owner_name}</div>}
-            </div>
-            <div className="col-md-6">
-              <label className="form-label">Business Name <span className="text-danger">*</span></label>
-              <input className={`form-control ${errors.business_name ? 'is-invalid' : ''}`}
-                value={form.business_name || ''} onChange={e => set('business_name', e.target.value)} />
-              {errors.business_name && <div className="invalid-feedback">{errors.business_name}</div>}
-            </div>
-            <div className="col-md-6">
-              <label className="form-label">Contact <span className="text-danger">*</span></label>
-              <input className={`form-control ${errors.contact ? 'is-invalid' : ''}`}
-                value={form.contact || ''} onChange={e => set('contact', e.target.value)} />
-              {errors.contact && <div className="invalid-feedback">{errors.contact}</div>}
-            </div>
-            <div className="col-md-6">
-              <label className="form-label">Business Type <span className="text-danger">*</span></label>
-              <select className={`form-select ${errors.business_type ? 'is-invalid' : ''}`}
-                value={form.business_type || ''} onChange={e => set('business_type', e.target.value)}>
-                <option value="">Select...</option>
-                {BIZ_TYPES.map(t => <option key={t} value={t}>{t}</option>)}
-              </select>
-              {errors.business_type && <div className="invalid-feedback">{errors.business_type}</div>}
-            </div>
+        )}
+        {status==='loading'&&(
+          <div><div className="spinner-border text-primary"></div><p className="mt-2 text-muted small">Detecting location...</p></div>
+        )}
+        {status==='denied'&&(
+          <div className="alert alert-warning small mb-0">
+            <i className="bi bi-exclamation-triangle me-1"></i>
+            Location permission was denied. Please allow location access and try again.
+            <br/><button className="btn btn-sm btn-warning mt-2" onClick={findMe}>Try Again</button>
           </div>
-
-          <div className="form-section-title"><i className="bi bi-geo-alt me-1"></i>Location</div>
-          <div className="row g-3">
-            <div className="col-12">
-              <label className="form-label">Address</label>
-              <input className="form-control" value={form.address || ''} onChange={e => set('address', e.target.value)} />
-            </div>
-            <div className="col-md-4">
-              <label className="form-label">City <span className="text-danger">*</span></label>
-              <input className={`form-control ${errors.city ? 'is-invalid' : ''}`}
-                value={form.city || ''} onChange={e => set('city', e.target.value)} />
-              {errors.city && <div className="invalid-feedback">{errors.city}</div>}
-            </div>
-            <div className="col-md-4">
-              <label className="form-label">State <span className="text-danger">*</span></label>
-              <input className={`form-control ${errors.state ? 'is-invalid' : ''}`}
-                value={form.state || ''} onChange={e => set('state', e.target.value)} />
-              {errors.state && <div className="invalid-feedback">{errors.state}</div>}
-            </div>
-            <div className="col-md-4">
-              <label className="form-label">Country <span className="text-danger">*</span></label>
-              <input className={`form-control ${errors.country ? 'is-invalid' : ''}`}
-                value={form.country || ''} onChange={e => set('country', e.target.value)} />
-              {errors.country && <div className="invalid-feedback">{errors.country}</div>}
-            </div>
+        )}
+        {status==='error'&&(
+          <div className="alert alert-danger small mb-0">
+            <i className="bi bi-x-circle me-1"></i>Could not detect location.
+            <br/><button className="btn btn-sm btn-danger mt-2" onClick={findMe}>Retry</button>
           </div>
-
-          <div className="d-flex gap-2 mt-4">
-            <button type="submit" className="btn btn-brand flex-grow-1 py-2" disabled={busy}>
-              {busy
-                ? <span className="spinner-border spinner-border-sm"></span>
-                : <><i className="bi bi-save me-1"></i>Save Changes</>}
-            </button>
-            <button type="button" className="btn btn-danger px-4 py-2" onClick={handleDelete} disabled={delBusy}>
-              {delBusy
-                ? <span className="spinner-border spinner-border-sm"></span>
-                : <><i className="bi bi-trash me-1"></i>Delete Listing</>}
+        )}
+        {status==='done'&&(
+          <div>
+            <div className="alert alert-success py-2 small mb-0">
+              <i className="bi bi-check-circle me-1"></i>
+              Location detected: <strong>{[userCity,userState].filter(Boolean).join(', ')}</strong>
+            </div>
+            <button className="btn btn-sm btn-outline-primary mt-2" onClick={findMe}>
+              <i className="bi bi-arrow-repeat me-1"></i>Re-detect
             </button>
           </div>
-        </form>
+        )}
       </div>
+
+      {status==='done'&&(
+        results.length===0?(
+          <div className="empty-state">
+            <i className="bi bi-map"></i>
+            <h5 className="mt-3 fw-semibold">No listings found nearby</h5>
+            <p className="text-muted">No listings in {[userCity,userState].filter(Boolean).join(', ')} yet.</p>
+          </div>
+        ):(
+          <>
+            <div className="d-flex gap-2 mb-3 flex-wrap">
+              <span className="stat-chip"><i className="bi bi-geo-alt me-1"></i>{results.length} nearby listings</span>
+              <span className="stat-chip">{[userCity,userState].filter(Boolean).join(', ')}</span>
+            </div>
+            <div className="row g-3">
+              {results.map(b=>(
+                <div key={b.id} className="col-12 col-sm-6 col-xl-4">
+                  {b.listing_type==='job'?<JobCard b={b}/>:<BizCard b={b}/>}
+                </div>
+              ))}
+            </div>
+          </>
+        )
+      )}
     </div>
   );
 }
@@ -906,93 +1152,86 @@ function EditForm({ biz, onRefresh, onDone }) {
 // ================================================================
 //  ADMIN TAB
 // ================================================================
-function AdminTab({ businesses, onRefresh, isAdmin, setIsAdmin }) {
-  const [pwd, setPwd]         = useState('');
-  const [err, setErr]         = useState('');
-  const [editTarget, setEdit] = useState(null);
-  const [search, setSearch]   = useState('');
-  const [fType, setFType]     = useState('');
+function AdminTab({ listings, onRefresh, isAdmin, setIsAdmin }) {
+  const [pwd,setPwd]=useState('');
+  const [err,setErr]=useState('');
+  const [editTarget,setEdit]=useState(null);
+  const [search,setSearch]=useState('');
+  const [fType,setFType]=useState('');
+  const [fView,setFView]=useState('all');
 
-  const login = e => {
+  const login=e=>{
     e.preventDefault();
-    if (pwd === ADMIN_PASSWORD) { setIsAdmin(true); setErr(''); }
+    if(pwd===ADMIN_PASSWORD){setIsAdmin(true);setErr('');}
     else setErr('Incorrect password');
   };
 
-  if (!isAdmin) {
-    return (
-      <div style={{maxWidth:'420px',margin:'0 auto'}}>
-        <div className="card-clean p-4">
-          <h5 className="fw-bold mb-0"><i className="bi bi-shield-lock-fill me-2 text-primary"></i>Admin Login</h5>
-          <p className="text-muted small mt-1 mb-4">Enter admin password to manage all listings.</p>
-          <form onSubmit={login}>
-            <div className="mb-3">
-              <label className="form-label">Admin Password</label>
-              <input type="password" className={`form-control ${err ? 'is-invalid' : ''}`}
-                placeholder="Enter password" value={pwd} onChange={e => setPwd(e.target.value)} autoFocus />
-              {err && <div className="invalid-feedback">{err}</div>}
-            </div>
-            <button type="submit" className="btn btn-brand w-100 py-2">
-              <i className="bi bi-unlock me-2"></i>Login
-            </button>
-          </form>
-        </div>
+  if(!isAdmin) return (
+    <div style={{maxWidth:'420px',margin:'0 auto'}}>
+      <div className="card-clean p-4">
+        <h5 className="fw-bold mb-0"><i className="bi bi-shield-lock-fill me-2 text-primary"></i>Admin Login</h5>
+        <p className="text-muted small mt-1 mb-4">Enter admin password to manage all listings.</p>
+        <form onSubmit={login}>
+          <div className="mb-3">
+            <label className="form-label">Admin Password</label>
+            <input type="password" className={`form-control ${err?'is-invalid':''}`}
+              placeholder="Enter password" value={pwd} onChange={e=>setPwd(e.target.value)} autoFocus/>
+            {err&&<div className="invalid-feedback">{err}</div>}
+          </div>
+          <button type="submit" className="btn btn-brand w-100 py-2"><i className="bi bi-unlock me-2"></i>Login</button>
+        </form>
       </div>
-    );
-  }
+    </div>
+  );
 
-  if (editTarget) {
-    return (
-      <EditForm
-        biz={editTarget}
-        onRefresh={onRefresh}
-        onDone={() => setEdit(null)}
-      />
-    );
-  }
+  if(editTarget) return <EditForm biz={editTarget} onRefresh={onRefresh} onDone={()=>setEdit(null)}/>;
 
-  const filtered = businesses.filter(b => {
-    const lq = search.toLowerCase();
-    return (
-      (!lq || [b.owner_name, b.business_name, b.contact, b.city, b.business_type]
-        .some(v => v?.toLowerCase().includes(lq))) &&
-      (!fType || b.business_type === fType)
-    );
+  const filtered=listings.filter(b=>{
+    const isJob=b.listing_type==='job';
+    if(fView==='business'&&isJob) return false;
+    if(fView==='job'&&!isJob) return false;
+    const lq=search.toLowerCase();
+    return (!lq||[b.owner_name,b.business_name,b.contact,b.city,b.business_type,b.designation]
+      .some(v=>v?.toLowerCase().includes(lq)))&&
+      (!fType||b.business_type===fType);
   });
 
   return (
     <div>
       <div className="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
         <div>
-          <h5 className="fw-bold mb-0">
-            <i className="bi bi-shield-check-fill me-2 text-success"></i>Admin Panel
-          </h5>
-          <small className="text-muted">
-            Total: <strong>{businesses.length}</strong> listings
-          </small>
+          <h5 className="fw-bold mb-0"><i className="bi bi-shield-check-fill me-2 text-success"></i>Admin Panel</h5>
+          <small className="text-muted">Total: <strong>{listings.length}</strong> listings</small>
         </div>
-        <button className="btn btn-sm btn-outline-danger" onClick={() => setIsAdmin(false)}>
+        <button className="btn btn-sm btn-outline-danger" onClick={()=>setIsAdmin(false)}>
           <i className="bi bi-box-arrow-right me-1"></i>Logout
         </button>
       </div>
 
-      {/* Admin filters */}
       <div className="card-clean p-3 mb-3">
-        <div className="row g-2">
-          <div className="col-md-8">
-            <input className="form-control" placeholder="Search by name, contact, city, type..."
-              value={search} onChange={e => setSearch(e.target.value)} />
+        <div className="row g-2 mb-2">
+          <div className="col-md-5">
+            <input className="form-control" placeholder="Search name, contact, city, type..."
+              value={search} onChange={e=>setSearch(e.target.value)}/>
           </div>
           <div className="col-md-4">
-            <select className="form-select" value={fType} onChange={e => setFType(e.target.value)}>
+            <select className="form-select" value={fType} onChange={e=>setFType(e.target.value)}>
               <option value="">All Types</option>
-              {BIZ_TYPES.map(t => <option key={t} value={t}>{t}</option>)}
+              {[...BIZ_TYPES,...JOB_FIELDS].filter((v,i,a)=>a.indexOf(v)===i).sort()
+                .map(t=><option key={t} value={t}>{t}</option>)}
+            </select>
+          </div>
+          <div className="col-md-3">
+            <select className="form-select" value={fView} onChange={e=>setFView(e.target.value)}>
+              <option value="all">All Listings</option>
+              <option value="business">Businesses Only</option>
+              <option value="job">Professionals Only</option>
             </select>
           </div>
         </div>
-        {(search || fType) && (
-          <div className="mt-2">
-            <button className="btn btn-sm btn-outline-secondary" onClick={() => { setSearch(''); setFType(''); }}>
+        {(search||fType)&&(
+          <div>
+            <button className="btn btn-sm btn-outline-secondary" onClick={()=>{setSearch('');setFType('');}}>
               <i className="bi bi-x-circle me-1"></i>Clear
             </button>
             <span className="ms-2 small text-muted">{filtered.length} result(s)</span>
@@ -1005,44 +1244,36 @@ function AdminTab({ businesses, onRefresh, isAdmin, setIsAdmin }) {
           <table className="table table-hover mb-0 admin-table">
             <thead>
               <tr>
-                <th>#</th>
-                <th>Business Name</th>
-                <th>Owner</th>
-                <th>Type</th>
-                <th>Contact</th>
-                <th>Location</th>
-                <th>Registered</th>
-                <th className="text-center">Actions</th>
+                <th>#</th><th>Name / Business</th><th>Type</th><th>Contact</th>
+                <th>Location</th><th>Kind</th><th>Date</th><th className="text-center">Actions</th>
               </tr>
             </thead>
             <tbody>
-              {filtered.length === 0 ? (
-                <tr>
-                  <td colSpan="8" className="text-center text-muted py-4">
-                    No listings found
-                  </td>
-                </tr>
-              ) : filtered.map((b, i) => (
+              {filtered.length===0?(
+                <tr><td colSpan="8" className="text-center text-muted py-4">No listings found</td></tr>
+              ):filtered.map((b,i)=>(
                 <tr key={b.id}>
-                  <td className="text-muted" style={{fontSize:'0.8rem'}}>{i + 1}</td>
-                  <td className="fw-semibold">{b.business_name}</td>
-                  <td>{b.owner_name}</td>
-                  <td><span className="type-badge" style={{fontSize:'0.7rem'}}>{b.business_type}</span></td>
+                  <td className="text-muted" style={{fontSize:'.78rem'}}>{i+1}</td>
                   <td>
-                    <a href={`tel:${b.contact}`} className="text-decoration-none text-dark">{b.contact}</a>
+                    <div className="fw-semibold">{b.listing_type==='job'?b.owner_name:b.business_name}</div>
+                    <div className="text-muted" style={{fontSize:'.78rem'}}>
+                      {b.listing_type==='job'?(b.designation||''):(b.owner_name||'')}
+                    </div>
                   </td>
-                  <td className="text-muted" style={{fontSize:'0.82rem'}}>
-                    {[b.city, b.state].filter(Boolean).join(', ')}
+                  <td><span className={b.listing_type==='job'?'job-badge':'type-badge'} style={{fontSize:'.68rem'}}>{b.business_type}</span></td>
+                  <td><a href={`tel:${b.contact}`} className="text-decoration-none text-dark">{b.contact}</a></td>
+                  <td className="text-muted" style={{fontSize:'.8rem'}}>{[b.city,b.state].filter(Boolean).join(', ')}</td>
+                  <td>
+                    <span className={`badge ${b.listing_type==='job'?'bg-success':'bg-primary'}`} style={{fontSize:'.68rem'}}>
+                      {b.listing_type==='job'?'Professional':'Business'}
+                    </span>
                   </td>
-                  <td className="text-muted" style={{fontSize:'0.8rem'}}>
-                    {new Date(b.created_at).toLocaleDateString('en-IN')}
-                  </td>
+                  <td className="text-muted" style={{fontSize:'.78rem'}}>{new Date(b.created_at).toLocaleDateString('en-IN')}</td>
                   <td className="text-center">
-                    <button className="btn btn-sm btn-outline-primary me-1 px-2" title="Edit"
-                      onClick={() => setEdit(b)}>
+                    <button className="btn btn-sm btn-outline-primary me-1 px-2" onClick={()=>setEdit(b)}>
                       <i className="bi bi-pencil"></i>
                     </button>
-                    <AdminDeleteBtn id={b.id} onRefresh={onRefresh} />
+                    <AdminDeleteBtn id={b.id} onRefresh={onRefresh}/>
                   </td>
                 </tr>
               ))}
@@ -1055,30 +1286,25 @@ function AdminTab({ businesses, onRefresh, isAdmin, setIsAdmin }) {
 }
 
 function AdminDeleteBtn({ id, onRefresh }) {
-  const [busy, setBusy] = useState(false);
-  const del = async () => {
-    if (!window.confirm('Delete this listing? This cannot be undone.')) return;
+  const [busy,setBusy]=useState(false);
+  const del=async()=>{
+    if(!window.confirm('Delete this listing?')) return;
     setBusy(true);
-    const { error } = await sb.from('businesses').delete().eq('id', id);
+    const {error}=await sb.from('businesses').delete().eq('id',id);
     setBusy(false);
-    if (error) showToast('Delete failed', 'error');
-    else { showToast('Listing removed', 'info'); onRefresh(); }
+    if(error) showToast('Delete failed','error');
+    else{showToast('Listing removed','info');onRefresh();}
   };
   return (
-    <button className="btn btn-sm btn-outline-danger px-2" title="Delete" onClick={del} disabled={busy}>
-      {busy
-        ? <span className="spinner-border spinner-border-sm" style={{width:'0.75rem',height:'0.75rem'}}></span>
-        : <i className="bi bi-trash"></i>}
+    <button className="btn btn-sm btn-outline-danger px-2" onClick={del} disabled={busy}>
+      {busy?<span className="spinner-border spinner-border-sm" style={{width:'.75rem',height:'.75rem'}}></span>
+           :<i className="bi bi-trash"></i>}
     </button>
   );
 }
 
-// ================================================================
-//  MOUNT
-// ================================================================
-ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
 </script>
-
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
